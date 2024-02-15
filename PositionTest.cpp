@@ -85,8 +85,8 @@ TEST_F(PositionTest, StartingPositionEnPassantTarget) {
 }
 
 TEST_F(PositionTest, EnPassantPositionEnPassantTarget) {
-    Position enPassantPosition = Position("rnbqkbnr/1pppp1pp/p7/4Pp2/8/8/PPPP1PPP/RNBQKBNR w KQkq f6 0 1");
-    EXPECT_EQ(enPassantPosition.getEnPassantTarget(), F6) << "Expected en passant target at index 45";
+    Position enPassantPosition = Position("rnbqkbnr/ppp2ppp/8/3Pp3/8/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 3");
+    EXPECT_EQ(enPassantPosition.getEnPassantTarget(), E6) << "Expected en passant target at index 44";
 }
 
 TEST_F(PositionTest, StartingPositionHalfmoveClock) {

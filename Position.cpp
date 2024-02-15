@@ -62,8 +62,9 @@ void Position::parseCastlingAbility(const char* FEN, int& i){
             }
             i++;
         }
+    } else {
+        i++;
     }
-    i++;
 }
 
 void Position::parseEnPassantTarget(const char* FEN, int& i){
@@ -71,7 +72,7 @@ void Position::parseEnPassantTarget(const char* FEN, int& i){
     if (FEN[i] == '-') {
         i += 2;
     } else {
-        enPassantTargetSquare = toBoardIndex(FEN[i] - 'a', FEN[i + 1] - '1');
+        enPassantTargetSquare = toBoardIndex(FEN[i + 1] - '1', FEN[i] - 'a');
         i += 3;
     }
 }
@@ -101,6 +102,7 @@ Position::Position(char* FEN) {
     currentPlayer = (FEN[i] == 'w') ? WHITE : BLACK;
     i += 2;
     parseCastlingAbility(FEN, i);
+    i++;
     parseEnPassantTarget(FEN, i);
     parseHalfmoveClock(FEN, i);
     parseFullmoveCounter(FEN, i);

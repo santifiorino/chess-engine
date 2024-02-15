@@ -100,5 +100,16 @@ TEST_F(MoveGeneratorTest, allBlackPawnsCanCapture) {
         Move move = moveGenerator.legalMoves[i+7];
         assertEqualMove(move, i+33, i+33-9, CAPTURE, EMPTY, WHITE_PAWN);
     }
-    
+}
+
+TEST_F(MoveGeneratorTest, whiteEnPassantCapture) {
+    Position position = Position("rnbqkbnr/ppp2ppp/8/3Pp3/8/8/PPPP1PPP/RNBQKBNR w KQkq e6 0 3");
+    EXPECT_EQ(moveGenerator.generateMoves(position), 16);
+    assertEqualMove(moveGenerator.legalMoves[15], D5, E6, EN_PASSANT, EMPTY, BLACK_PAWN);
+}
+
+TEST_F(MoveGeneratorTest, blackEnPassantCapture) {
+    Position position = Position("rnbqkbnr/ppp2ppp/3P4/8/4pP2/8/PPPP2PP/RNBQKBNR b KQkq f3 0 4");
+    EXPECT_EQ(moveGenerator.generateMoves(position), 15);
+    assertEqualMove(moveGenerator.legalMoves[13], E4, F3, EN_PASSANT, EMPTY, WHITE_PAWN);
 }

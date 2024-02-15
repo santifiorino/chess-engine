@@ -88,18 +88,25 @@ void MoveGenerator::generateDirectedPawnCaptures(Position& position, int& i, Dir
     if (color == WHITE){
         pawns = position.getBitboard(WHITE_PAWN);
         enemyPieces = position.getBlackOccupiedSquares();
+        enemyPieces |= (1ULL << position.getEnPassantTarget());
         ableToCapture = direction == EAST ? whitePawnsAbleToCaptureEast(pawns, enemyPieces) : whitePawnsAbleToCaptureWest(pawns, enemyPieces);
         offset = direction == EAST ? NORTH_EAST : NORTH_WEST;
     } else {
         pawns = position.getBitboard(BLACK_PAWN);
         enemyPieces = position.getWhiteOccupiedSquares();
+        enemyPieces |= (1ULL << position.getEnPassantTarget());
         ableToCapture = direction == EAST ? blackPawnsAbleToCaptureEast(pawns, enemyPieces) : blackPawnsAbleToCaptureWest(pawns, enemyPieces);
         offset = direction == EAST ? SOUTH_EAST : SOUTH_WEST;
     }
     while (ableToCapture) {
         uint8 from = bitScanForward(ableToCapture);
         uint8 to = from + offset;
-        Move move = {from, to, CAPTURE, EMPTY, position.getPieceAt(to)};
+        Move move;
+        if (to == position.getEnPassantTarget()) {
+            move = {from, to, EN_PASSANT, EMPTY, color == WHITE ? BLACK_PAWN : WHITE_PAWN};
+        } else {
+            move = {from, to, CAPTURE, EMPTY, position.getPieceAt(to)};
+        }
         legalMoves[i] = move;
         i++;
         ableToCapture &= ableToCapture - 1;
