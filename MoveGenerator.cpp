@@ -3,7 +3,7 @@
 #include "Utils.h"
 
 MoveGenerator::MoveGenerator() {
-    
+    precalculatePawnAttacks();
 }
 
 int MoveGenerator::generateMoves(Position &position) {
@@ -59,67 +59,35 @@ void MoveGenerator::generatePawnPushes(Position& position, int& i){
     }
 }
 
-uint64 MoveGenerator::whitePawnEastAttacks(uint64 whitePawns) { return noEaOne(whitePawns); }
-uint64 MoveGenerator::whitePawnWestAttacks(uint64 whitePawns) { return noWeOne(whitePawns); }
-
-uint64 MoveGenerator::blackPawnEastAttacks(uint64 blackPawns) { return soEaOne(blackPawns); }
-uint64 MoveGenerator::blackPawnWestAttacks(uint64 blackPawns) { return soWeOne(blackPawns); }
-
-uint64 MoveGenerator::whitePawnsAbleToCaptureEast(uint64 whitePawns, uint64 blackPieces) {
-    return whitePawns & blackPawnWestAttacks(blackPieces);
-}
-
-uint64 MoveGenerator::whitePawnsAbleToCaptureWest(uint64 whitePawns, uint64 blackPieces) {
-    return whitePawns & blackPawnEastAttacks(blackPieces);
-}
-
-uint64 MoveGenerator::blackPawnsAbleToCaptureEast(uint64 blackPawns, uint64 whitePieces) {
-    return blackPawns & whitePawnWestAttacks(whitePieces);
-}
-
-uint64 MoveGenerator::blackPawnsAbleToCaptureWest(uint64 blackPawns, uint64 whitePieces) {
-    return blackPawns & whitePawnEastAttacks(whitePieces);
-}
-
-void MoveGenerator::generateDirectedPawnCaptures(Position& position, int& i, Direction direction) {
-    Color color = position.getCurrentPlayer();
-    uint64 pawns, enemyPieces, ableToCapture;
-    uint8 offset;
-    if (color == WHITE){
-        pawns = position.getBitboard(WHITE_PAWN);
-        enemyPieces = position.getBlackOccupiedSquares();
-        enemyPieces |= (1ULL << position.getEnPassantTarget());
-        ableToCapture = direction == EAST ? whitePawnsAbleToCaptureEast(pawns, enemyPieces) : whitePawnsAbleToCaptureWest(pawns, enemyPieces);
-        offset = direction == EAST ? NORTH_EAST : NORTH_WEST;
-    } else {
-        pawns = position.getBitboard(BLACK_PAWN);
-        enemyPieces = position.getWhiteOccupiedSquares();
-        enemyPieces |= (1ULL << position.getEnPassantTarget());
-        ableToCapture = direction == EAST ? blackPawnsAbleToCaptureEast(pawns, enemyPieces) : blackPawnsAbleToCaptureWest(pawns, enemyPieces);
-        offset = direction == EAST ? SOUTH_EAST : SOUTH_WEST;
-    }
-    while (ableToCapture) {
-        uint8 from = bitScanForward(ableToCapture);
-        uint8 to = from + offset;
-        Move move;
-        if (to == position.getEnPassantTarget()) {
-            move = {from, to, EN_PASSANT, EMPTY, color == WHITE ? BLACK_PAWN : WHITE_PAWN};
-        } else {
-            move = {from, to, CAPTURE, EMPTY, position.getPieceAt(to)};
-        }
-        legalMoves[i] = move;
-        i++;
-        ableToCapture &= ableToCapture - 1;
+void MoveGenerator::precalculatePawnAttacks() {
+    for (int i = 0; i < 64; i++) {
+        uint64 pawn = 1ULL << i;
+        arrPawnAttacks[WHITE][i] = noEaOne(pawn) | noWeOne(pawn);
+        arrPawnAttacks[BLACK][i] = soEaOne(pawn) | soWeOne(pawn);
     }
 }
 
 void MoveGenerator::generatePawnCaptures(Position& position, int& i) {
-    if (position.getCurrentPlayer() == WHITE) {
-        generateDirectedPawnCaptures(position, i, EAST);
-        generateDirectedPawnCaptures(position, i, WEST);
-    } else {
-        generateDirectedPawnCaptures(position, i, EAST);
-        generateDirectedPawnCaptures(position, i, WEST);
+    Color color = position.getCurrentPlayer();
+    uint64 pawns = color == WHITE ? position.getBitboard(WHITE_PAWN) : position.getBitboard(BLACK_PAWN);
+    uint64 enemyPieces = color == WHITE ? position.getBlackOccupiedSquares() : position.getWhiteOccupiedSquares();
+    enemyPieces |= 1ULL << position.getEnPassantTarget();
+    while (pawns) {
+        uint8 from = bitScanForward(pawns);
+        uint64 attacks = arrPawnAttacks[color][from] & enemyPieces;
+        while (attacks) {
+            uint8 to = bitScanForward(attacks);
+            Move move;
+            if (to == position.getEnPassantTarget()) {
+                move = {from, to, EN_PASSANT, EMPTY, color == WHITE ? BLACK_PAWN : WHITE_PAWN};
+            } else {
+                move = {from, to, CAPTURE, EMPTY, position.getPieceAt(to)};
+            }
+            legalMoves[i] = move;
+            i++;
+            attacks &= attacks - 1;
+        }
+        pawns &= pawns - 1;
     }
 }
     

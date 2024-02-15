@@ -30,6 +30,8 @@ class MoveGenerator {
     private:
         // PAWN MOVES
         // Pawn push generation
+        void precalculatePawnAttacks();
+
         uint64 whitePawnsAbleToPush(uint64 whitePawns, uint64 empty);
         uint64 whitePawnsAbleToDoublePush(uint64 whitePawns, uint64 empty);
 

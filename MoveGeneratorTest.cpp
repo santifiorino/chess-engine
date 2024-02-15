@@ -78,28 +78,27 @@ TEST_F(MoveGeneratorTest, arbitraryBlackToMovePosition) {
 TEST_F(MoveGeneratorTest, allWhitePawnsCanCapture) {
     Position position = Position("rnbqkbnr/8/8/pppppppp/PPPPPPPP/8/8/RNBQKBNR w KQkq h6 0 9");
     EXPECT_EQ(moveGenerator.generateMoves(position), 14);
-    for (int i = 0; i < 7; i++) {
-        Move move = moveGenerator.legalMoves[i];
-        assertEqualMove(move, i+24, i+24+9, CAPTURE, EMPTY, BLACK_PAWN);
+    assertEqualMove(moveGenerator.legalMoves[0], A4, B5, CAPTURE, EMPTY, BLACK_PAWN);
+    for (int i = 0; i < 6; i += 1) {
+        Move move = moveGenerator.legalMoves[1 + 2*i];
+        assertEqualMove(move, i+1+24, i+1+24+7, CAPTURE, EMPTY, BLACK_PAWN);
+        move = moveGenerator.legalMoves[1 + 2*i + 1];
+        assertEqualMove(move, i+1+24, i+1+24+9, CAPTURE, EMPTY, BLACK_PAWN);
     }
-    for (int i = 0; i < 7; i++) {
-        Move move = moveGenerator.legalMoves[i+7];
-        assertEqualMove(move, i+25, i+25+7, CAPTURE, EMPTY, BLACK_PAWN);
-    }
-
+    assertEqualMove(moveGenerator.legalMoves[13], H4, G5, CAPTURE, EMPTY, BLACK_PAWN);
 }
 
 TEST_F(MoveGeneratorTest, allBlackPawnsCanCapture) {
     Position position = Position("rnbqkbnr/8/8/pppppppp/PPPPPPPP/8/4K3/RNBQ1BNR b kq - 1 9");
     EXPECT_EQ(moveGenerator.generateMoves(position), 14);
-    for (int i = 0; i < 7; i++) {
-        Move move = moveGenerator.legalMoves[i];
-        assertEqualMove(move, i+32, i+32-7, CAPTURE, EMPTY, WHITE_PAWN);
+    assertEqualMove(moveGenerator.legalMoves[0], A5, B4, CAPTURE, EMPTY, WHITE_PAWN);
+    for (int i = 0; i < 6; i += 1) {
+        Move move = moveGenerator.legalMoves[1 + 2*i];
+        assertEqualMove(move, i+1+32, i+1+32-9, CAPTURE, EMPTY, WHITE_PAWN);
+        move = moveGenerator.legalMoves[1 + 2*i + 1];
+        assertEqualMove(move, i+1+32, i+1+32-7, CAPTURE, EMPTY, WHITE_PAWN);
     }
-    for (int i = 0; i < 7; i++) {
-        Move move = moveGenerator.legalMoves[i+7];
-        assertEqualMove(move, i+33, i+33-9, CAPTURE, EMPTY, WHITE_PAWN);
-    }
+    assertEqualMove(moveGenerator.legalMoves[13], H5, G4, CAPTURE, EMPTY, WHITE_PAWN);
 }
 
 TEST_F(MoveGeneratorTest, whiteEnPassantCapture) {
