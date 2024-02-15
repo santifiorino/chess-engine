@@ -1,7 +1,7 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#include "Constants.h"
+#include "Utils.h"
 
 class Position {
 public:
@@ -10,7 +10,6 @@ public:
     // Accessing the position
     Piece getPieceAt(int square);
     uint64 getBitboard(Piece piece);
-    uint64 getEmptySquares();
     Color getCurrentPlayer();
     bool whiteCanCastleKingside();
     bool whiteCanCastleQueenside();
@@ -19,6 +18,12 @@ public:
     uint8 getEnPassantTarget();
     uint8 getHalfmoveClock();
     uint8 getFullmoveCounter();
+
+    // Bitboard
+    uint64 getBlackOccupiedSquares();
+    uint64 getWhiteOccupiedSquares();
+    uint64 getOccupiedSquares();
+    uint64 getEmptySquares();
     
 private:
     // Square centric board representation

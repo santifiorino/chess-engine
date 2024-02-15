@@ -46,9 +46,9 @@ TEST_F(PositionTest, StartingPositionBitBoard) {
     EXPECT_EQ(startingPosition.getBitboard(WHITE_BISHOP), 0x24) << "Expected WHITE_BISHOP bitboard to be 0x24";
     // 1000 0001
     EXPECT_EQ(startingPosition.getBitboard(WHITE_ROOK), 0x81) << "Expected WHITE_ROOK bitboard to be 0x81";
-    // 0000 1000 (its mirrored)
+    // 0000 1000
     EXPECT_EQ(startingPosition.getBitboard(WHITE_QUEEN), 0x8) << "Expected WHITE_QUEEN bitboard to be 0x8";
-    // 0001 0000 (its mirrored)
+    // 0001 0000
     EXPECT_EQ(startingPosition.getBitboard(WHITE_KING), 0x10) << "Expected WHITE_KING bitboard to be 0x10";
     // 1111 1111 (0000) x 2 x 6
     EXPECT_EQ(startingPosition.getBitboard(BLACK_PAWN), 0xFF000000000000) << "Expected BLACK_PAWN bitboard to be 0xFF000000000000";

@@ -20,7 +20,7 @@ add_executable(
   PositionTest
   PositionTest.cpp
   Position.cpp
-  Constants.cpp
+  Utils.cpp
 )
 
 target_link_libraries(
@@ -33,7 +33,7 @@ add_executable(
   MoveGeneratorTest.cpp
   MoveGenerator.cpp
   Position.cpp
-  Constants.cpp
+  Utils.cpp
 )
 
 target_link_libraries(

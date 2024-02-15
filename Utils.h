@@ -37,6 +37,17 @@ enum AlgebraicNotation {
     A8, B8, C8, D8, E8, F8, G8, H8
 };
 
+enum Direction {
+    NORTH_WEST = 7,
+    NORTH = 8,
+    NORTH_EAST = 9,
+    WEST = -1,
+    EAST = 1,
+    SOUTH_WEST = -9,
+    SOUTH = -8,
+    SOUTH_EAST = -7
+};
+
 
 const uint64 RANK_1 = 0xFF;
 const uint64 RANK_2 = 0xFF00;
@@ -49,13 +60,17 @@ const uint64 RANK_8 = 0xFF00000000000000;
 
 
 
-inline uint64 nortOne(uint64 b) {
-    return b << 8;
-}
+uint64 soutOne (uint64 b);
+uint64 nortOne (uint64 b);
+const uint64 notAFile = 0xFEFEFEFEFEFEFEFE;
+const uint64 notHFile = 0x7F7F7F7F7F7F7F7F;
+uint64 eastOne (uint64 b);
+uint64 noEaOne (uint64 b);
+uint64 soEaOne (uint64 b);
+uint64 westOne (uint64 b);
+uint64 soWeOne (uint64 b);
+uint64 noWeOne (uint64 b);
 
-inline uint64 soutOne(uint64 b) {
-    return b >> 8;
-}
 
 // file and rank to array index
 inline int toBoardIndex(int file, int rank) {
