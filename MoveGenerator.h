@@ -27,6 +27,12 @@ class MoveGenerator {
         int generateMoves(Position &position);
     private:
         uint64 whitePawnsAbleToPush(uint64 whitePawns, uint64 empty);
+        uint64 whitePawnsAbleToDoublePush(uint64 whitePawns, uint64 empty);
+
+        uint64 blackPawnsAbleToPush(uint64 blackPawns, uint64 empty);
+        uint64 blackPawnsAbleToDoublePush(uint64 blackPawns, uint64 empty);
+
+        void generatePawnPushes(uint64 pushes, int& i, Color color, bool isDoublePush);
 };
 
 #endif
