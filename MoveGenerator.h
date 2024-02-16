@@ -44,6 +44,11 @@ class MoveGenerator {
         uint64 arrKnightMoves[64];
         void precalculateKnightMoves();
         void generateKnightMoves(Position &position, int &i);
+
+        // KING MOVES
+        uint64 arrKingMoves[64];
+        void precalculateKingMoves();
+        void generateKingMoves(Position &position, int &i);
 };
 
 #endif

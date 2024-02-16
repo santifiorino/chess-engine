@@ -5,6 +5,7 @@
 MoveGenerator::MoveGenerator() {
     precalculatePawnAttacks();
     precalculateKnightMoves();
+    precalculateKingMoves();
 }
 
 int MoveGenerator::generateMoves(Position &position) {
@@ -14,6 +15,8 @@ int MoveGenerator::generateMoves(Position &position) {
     generatePawnCaptures(position, i);
     // Knight Moves
     generateKnightMoves(position, i);
+    // King Moves
+    generateKingMoves(position, i);
     return i;
 }
 
@@ -125,7 +128,6 @@ void MoveGenerator::generateKnightMoves(Position& position, int& i) {
     Color color = position.getCurrentPlayer();
     uint64 knights = color == WHITE ? position.getBitboard(WHITE_KNIGHT) : position.getBitboard(BLACK_KNIGHT);
     uint64 friendlyPieces = color == WHITE ? position.getWhiteOccupiedSquares() : position.getBlackOccupiedSquares();
-    uint64 enemyPieces = color == WHITE ? position.getBlackOccupiedSquares() : position.getWhiteOccupiedSquares();
     while (knights) {
         uint8 from = bitScanForward(knights);
         uint64 moves = arrKnightMoves[from] & ~friendlyPieces;
@@ -137,5 +139,33 @@ void MoveGenerator::generateKnightMoves(Position& position, int& i) {
             moves &= moves - 1;
         }
         knights &= knights - 1;
+    }
+}
+
+// KING MOVES
+// https://www.chessprogramming.org/King_Pattern
+void MoveGenerator::precalculateKingMoves() {
+    uint64 sqBB = 1;
+    for (int sq = 0; sq < 64; sq++, sqBB <<= 1) {
+        uint64 kingSet = sqBB;
+        uint64 attacks = eastOne(kingSet) | westOne(kingSet);
+        kingSet |= attacks;
+        attacks |= nortOne(kingSet) | soutOne(kingSet);
+        arrKingMoves[sq] = attacks;
+    }
+}
+
+void MoveGenerator::generateKingMoves(Position& position, int& i) {
+    Color color = position.getCurrentPlayer();
+    uint64 king = color == WHITE ? position.getBitboard(WHITE_KING) : position.getBitboard(BLACK_KING);
+    uint64 friendlyPieces = color == WHITE ? position.getWhiteOccupiedSquares() : position.getBlackOccupiedSquares();
+    uint8 from = bitScanForward(king);
+    uint64 moves = arrKingMoves[from] & ~friendlyPieces;
+    while (moves) {
+        uint8 to = bitScanForward(moves);
+        Move move = {from, to, position.getPieceAt(to) == EMPTY ? NORMAL : CAPTURE, position.getPieceAt(to), EMPTY};
+        legalMoves[i] = move;
+        i++;
+        moves &= moves - 1;
     }
 }
