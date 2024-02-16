@@ -81,7 +81,7 @@ TEST_F(PositionTest, StartingPositionCastlingRights) {
 }
 
 TEST_F(PositionTest, StartingPositionEnPassantTarget) {
-    EXPECT_EQ(startingPosition.getEnPassantTarget(), 0) << "Expected no en passant target";
+    EXPECT_EQ(startingPosition.getEnPassantTarget(), 64) << "Expected no en passant target";
 }
 
 TEST_F(PositionTest, EnPassantPositionEnPassantTarget) {

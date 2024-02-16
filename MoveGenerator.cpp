@@ -17,8 +17,15 @@ int MoveGenerator::generateMoves(Position &position) {
     return i;
 }
 
+void MoveGenerator::addMove(int& i, uint8 from, uint8 to, MoveType type, Piece captured, Piece promotion) {
+    Move move = {from, to, type, captured, promotion};
+    legalMoves[i] = move;
+    i++;
+}
+
 // PAWN MOVES
 // Pawn pushes
+// https://www.chessprogramming.org/Pawn_Pushes_(Bitboards)
 uint64 MoveGenerator::pawnsAbleToPush(uint64 pawns, uint64 empty, Color color) {
     return color == WHITE ? soutOne(empty) & pawns : nortOne(empty) & pawns;
 }
@@ -35,9 +42,14 @@ void MoveGenerator::generatePawnPush(uint64 pawns, int& i, Color color, bool isD
         uint8 from = bitScanForward(pawns);
         if (from == 0) break;
         uint8 to = from + (isDoublePush ? 16 : 8) * (color == WHITE ? 1 : -1);
-        Move move = {from, to, NORMAL, EMPTY, EMPTY};
-        legalMoves[i] = move;
-        i++;
+        if (color == WHITE && to >= 56 || color == BLACK && to < 8) {
+            addMove(i, from, to, PROMOTION, EMPTY, color == WHITE ? WHITE_QUEEN : BLACK_QUEEN);
+            addMove(i, from, to, PROMOTION, EMPTY, color == WHITE ? WHITE_ROOK : BLACK_ROOK);
+            addMove(i, from, to, PROMOTION, EMPTY, color == WHITE ? WHITE_BISHOP : BLACK_BISHOP);
+            addMove(i, from, to, PROMOTION, EMPTY, color == WHITE ? WHITE_KNIGHT : BLACK_KNIGHT);
+        } else {
+            addMove(i, from, to, NORMAL, EMPTY, EMPTY);
+        }
         pawns &= pawns - 1;
     }
 }
@@ -69,7 +81,7 @@ void MoveGenerator::generatePawnCaptures(Position& position, int& i) {
     Color color = position.getCurrentPlayer();
     uint64 pawns = color == WHITE ? position.getBitboard(WHITE_PAWN) : position.getBitboard(BLACK_PAWN);
     uint64 enemyPieces = color == WHITE ? position.getBlackOccupiedSquares() : position.getWhiteOccupiedSquares();
-    enemyPieces |= 1ULL << position.getEnPassantTarget();
+    if (position.getEnPassantTarget() != 64) enemyPieces |= 1ULL << position.getEnPassantTarget();
     while (pawns) {
         uint8 from = bitScanForward(pawns);
         uint64 attacks = arrPawnAttacks[color][from] & enemyPieces;
@@ -77,12 +89,17 @@ void MoveGenerator::generatePawnCaptures(Position& position, int& i) {
             uint8 to = bitScanForward(attacks);
             Move move;
             if (to == position.getEnPassantTarget()) {
-                move = {from, to, EN_PASSANT, color == WHITE ? BLACK_PAWN : WHITE_PAWN, EMPTY};
+                addMove(i, from, to, EN_PASSANT, color == WHITE ? BLACK_PAWN : WHITE_PAWN, EMPTY);
             } else {
-                move = {from, to, CAPTURE, position.getPieceAt(to), EMPTY};
+                if (color == WHITE && to >= 56 || color == BLACK && to < 8) {
+                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), color == WHITE ? WHITE_QUEEN : BLACK_QUEEN);
+                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), color == WHITE ? WHITE_ROOK : BLACK_ROOK);
+                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), color == WHITE ? WHITE_BISHOP : BLACK_BISHOP);
+                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), color == WHITE ? WHITE_KNIGHT : BLACK_KNIGHT);
+                } else {
+                    addMove(i, from, to, CAPTURE, position.getPieceAt(to), EMPTY);
+                }
             }
-            legalMoves[i] = move;
-            i++;
             attacks &= attacks - 1;
         }
         pawns &= pawns - 1;
@@ -90,6 +107,7 @@ void MoveGenerator::generatePawnCaptures(Position& position, int& i) {
 }
 
 // KNIGHT MOVES
+// https://www.chessprogramming.org/Knight_Pattern
 void MoveGenerator::precalculateKnightMoves() {
     for (int i = 0; i < 64; i++) {
         uint64 knight = 1ULL << i;

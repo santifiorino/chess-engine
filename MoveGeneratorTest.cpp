@@ -150,3 +150,59 @@ TEST_F(MoveGeneratorTest, blackEnPassantRightToLeft) {
     EXPECT_EQ(moveGenerator.generateMoves(blackEnPassantRightToLeftPosition), 20);
     assertEqualMove(moveGenerator.legalMoves[7], C4, B3, EN_PASSANT, WHITE_PAWN, EMPTY);
 }
+
+TEST_F(MoveGeneratorTest, whitePawnPromotion) {
+    Position whitePromotePosition = Position("r7/1kn2P2/1q6/8/2p5/4B3/6K1/5R2 w - - 0 1");
+    EXPECT_EQ(moveGenerator.generateMoves(whitePromotePosition), 4);
+    assertEqualMove(moveGenerator.legalMoves[0], F7, F8, PROMOTION, EMPTY, WHITE_QUEEN);
+    assertEqualMove(moveGenerator.legalMoves[1], F7, F8, PROMOTION, EMPTY, WHITE_ROOK);
+    assertEqualMove(moveGenerator.legalMoves[2], F7, F8, PROMOTION, EMPTY, WHITE_BISHOP);
+    assertEqualMove(moveGenerator.legalMoves[3], F7, F8, PROMOTION, EMPTY, WHITE_KNIGHT);
+}
+
+TEST_F(MoveGeneratorTest, whitePawnCapturePromotion) {
+    Position whiteCapturePromotePosition = Position("r3r1b1/1kn2P2/nq6/5Q2/2p5/4B3/6K1/5R2 w - - 0 1");
+    EXPECT_EQ(moveGenerator.generateMoves(whiteCapturePromotePosition), 12);
+    assertEqualMove(moveGenerator.legalMoves[0], F7, F8, PROMOTION, EMPTY, WHITE_QUEEN);
+    assertEqualMove(moveGenerator.legalMoves[1], F7, F8, PROMOTION, EMPTY, WHITE_ROOK);
+    assertEqualMove(moveGenerator.legalMoves[2], F7, F8, PROMOTION, EMPTY, WHITE_BISHOP);
+    assertEqualMove(moveGenerator.legalMoves[3], F7, F8, PROMOTION, EMPTY, WHITE_KNIGHT);
+
+    assertEqualMove(moveGenerator.legalMoves[4], F7, E8, PROMOTION_CAPTURE, BLACK_ROOK, WHITE_QUEEN);
+    assertEqualMove(moveGenerator.legalMoves[5], F7, E8, PROMOTION_CAPTURE, BLACK_ROOK, WHITE_ROOK);
+    assertEqualMove(moveGenerator.legalMoves[6], F7, E8, PROMOTION_CAPTURE, BLACK_ROOK, WHITE_BISHOP);
+    assertEqualMove(moveGenerator.legalMoves[7], F7, E8, PROMOTION_CAPTURE, BLACK_ROOK, WHITE_KNIGHT);
+
+    assertEqualMove(moveGenerator.legalMoves[8], F7, G8, PROMOTION_CAPTURE, BLACK_BISHOP, WHITE_QUEEN);
+    assertEqualMove(moveGenerator.legalMoves[9], F7, G8, PROMOTION_CAPTURE, BLACK_BISHOP, WHITE_ROOK);
+    assertEqualMove(moveGenerator.legalMoves[10], F7, G8, PROMOTION_CAPTURE, BLACK_BISHOP, WHITE_BISHOP);
+    assertEqualMove(moveGenerator.legalMoves[11], F7, G8, PROMOTION_CAPTURE, BLACK_BISHOP, WHITE_KNIGHT);
+};
+
+TEST_F(MoveGeneratorTest, blackPawnPromotion) {
+    Position blackToPromotePosition = Position("8/1k6/8/8/8/8/1p4K1/8 b - - 0 1");
+    EXPECT_EQ(moveGenerator.generateMoves(blackToPromotePosition), 4);
+    assertEqualMove(moveGenerator.legalMoves[0], B2, B1, PROMOTION, EMPTY, BLACK_QUEEN);
+    assertEqualMove(moveGenerator.legalMoves[1], B2, B1, PROMOTION, EMPTY, BLACK_ROOK);
+    assertEqualMove(moveGenerator.legalMoves[2], B2, B1, PROMOTION, EMPTY, BLACK_BISHOP);
+    assertEqualMove(moveGenerator.legalMoves[3], B2, B1, PROMOTION, EMPTY, BLACK_KNIGHT);
+}
+
+TEST_F(MoveGeneratorTest, blackPawnCapturePromotion) {
+    Position blackToCapturePromotePosition = Position("8/1k6/8/8/8/8/1p4K1/R1B5 b - - 0 1");
+    EXPECT_EQ(moveGenerator.generateMoves(blackToCapturePromotePosition), 12);
+    assertEqualMove(moveGenerator.legalMoves[0], B2, B1, PROMOTION, EMPTY, BLACK_QUEEN);
+    assertEqualMove(moveGenerator.legalMoves[1], B2, B1, PROMOTION, EMPTY, BLACK_ROOK);
+    assertEqualMove(moveGenerator.legalMoves[2], B2, B1, PROMOTION, EMPTY, BLACK_BISHOP);
+    assertEqualMove(moveGenerator.legalMoves[3], B2, B1, PROMOTION, EMPTY, BLACK_KNIGHT);
+
+    assertEqualMove(moveGenerator.legalMoves[4], B2, A1, PROMOTION_CAPTURE, WHITE_ROOK, BLACK_QUEEN);
+    assertEqualMove(moveGenerator.legalMoves[5], B2, A1, PROMOTION_CAPTURE, WHITE_ROOK, BLACK_ROOK);
+    assertEqualMove(moveGenerator.legalMoves[6], B2, A1, PROMOTION_CAPTURE, WHITE_ROOK, BLACK_BISHOP);
+    assertEqualMove(moveGenerator.legalMoves[7], B2, A1, PROMOTION_CAPTURE, WHITE_ROOK, BLACK_KNIGHT);
+
+    assertEqualMove(moveGenerator.legalMoves[8], B2, C1, PROMOTION_CAPTURE, WHITE_BISHOP, BLACK_QUEEN);
+    assertEqualMove(moveGenerator.legalMoves[9], B2, C1, PROMOTION_CAPTURE, WHITE_BISHOP, BLACK_ROOK);
+    assertEqualMove(moveGenerator.legalMoves[10], B2, C1, PROMOTION_CAPTURE, WHITE_BISHOP, BLACK_BISHOP);
+    assertEqualMove(moveGenerator.legalMoves[11], B2, C1, PROMOTION_CAPTURE, WHITE_BISHOP, BLACK_KNIGHT);
+}

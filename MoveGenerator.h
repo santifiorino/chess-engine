@@ -10,7 +10,8 @@ enum MoveType {
     EN_PASSANT,
     CASTLE_KINGSIDE,
     CASTLE_QUEENSIDE,
-    PROMOTION
+    PROMOTION,
+    PROMOTION_CAPTURE
 };
 
 struct Move {
@@ -27,6 +28,7 @@ class MoveGenerator {
         Move legalMoves[218];
         int generateMoves(Position &position);
     private:
+        void addMove(int& i, uint8 from, uint8 to, MoveType type, Piece captured, Piece promotion);
         // PAWN MOVES
         // Pawn pushes
         uint64 pawnsAbleToPush(uint64 pawns, uint64 empty, Color color);
@@ -41,7 +43,7 @@ class MoveGenerator {
         // KNIGHT MOVES
         uint64 arrKnightMoves[64];
         void precalculateKnightMoves();
-        void generateKnightMoves(Position& position, int& i);
+        void generateKnightMoves(Position &position, int &i);
 };
 
 #endif

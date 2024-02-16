@@ -68,7 +68,7 @@ void Position::parseCastlingAbility(const char* FEN, int& i){
 }
 
 void Position::parseEnPassantTarget(const char* FEN, int& i){
-    enPassantTargetSquare = 0;
+    enPassantTargetSquare = 64;
     if (FEN[i] == '-') {
         i += 2;
     } else {

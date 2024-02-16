@@ -48,7 +48,6 @@ enum Direction {
     SOUTH_EAST = -7
 };
 
-
 const uint64 RANK_1 = 0xFF;
 const uint64 RANK_2 = 0xFF00;
 const uint64 RANK_3 = 0xFF0000;
@@ -58,7 +57,14 @@ const uint64 RANK_6 = 0xFF0000000000;
 const uint64 RANK_7 = 0xFF000000000000;
 const uint64 RANK_8 = 0xFF00000000000000;
 
-
+const uint64 FILE_A = 0x0101010101010101;
+const uint64 FILE_B = 0x0202020202020202;
+const uint64 FILE_C = 0x0404040404040404;
+const uint64 FILE_D = 0x0808080808080808;
+const uint64 FILE_E = 0x1010101010101010;
+const uint64 FILE_F = 0x2020202020202020;
+const uint64 FILE_G = 0x4040404040404040;
+const uint64 FILE_H = 0x8080808080808080;
 
 uint64 soutOne (uint64 b);
 uint64 nortOne (uint64 b);
@@ -70,7 +76,6 @@ uint64 soEaOne (uint64 b);
 uint64 westOne (uint64 b);
 uint64 soWeOne (uint64 b);
 uint64 noWeOne (uint64 b);
-
 
 // file and rank to array index
 inline int toBoardIndex(int file, int rank) {
