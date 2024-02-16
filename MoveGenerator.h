@@ -17,8 +17,8 @@ struct Move {
     uint8 from;
     uint8 to;
     MoveType type;
-    Piece promotion;
     Piece captured;
+    Piece promotion;
 };
 
 class MoveGenerator {
@@ -26,36 +26,22 @@ class MoveGenerator {
         MoveGenerator();
         Move legalMoves[218];
         int generateMoves(Position &position);
-        uint64 arrPawnAttacks[2][64];
     private:
         // PAWN MOVES
-        // Pawn push generation
-        void precalculatePawnAttacks();
-
-        uint64 whitePawnsAbleToPush(uint64 whitePawns, uint64 empty);
-        uint64 whitePawnsAbleToDoublePush(uint64 whitePawns, uint64 empty);
-
-        uint64 blackPawnsAbleToPush(uint64 blackPawns, uint64 empty);
-        uint64 blackPawnsAbleToDoublePush(uint64 blackPawns, uint64 empty);
-
+        // Pawn pushes
+        uint64 pawnsAbleToPush(uint64 pawns, uint64 empty, Color color);
+        uint64 pawnsAbleToDoublePush(uint64 pawns, uint64 empty, Color color);
         void generatePawnPush(uint64 pushes, int& i, Color color, bool isDoublePush);
         void generatePawnPushes(Position& position, int& i);
-        // Pawn attack generation
-        uint64 whitePawnEastAttacks(uint64 whitePawns);
-        uint64 whitePawnWestAttacks(uint64 whitePawns);
-
-        uint64 blackPawnEastAttacks(uint64 blackPawns);
-        uint64 blackPawnWestAttacks(uint64 blackPawns);
-
-        uint64 whitePawnsAbleToCaptureEast(uint64 whitePawns, uint64 blackPieces);
-        uint64 whitePawnsAbleToCaptureWest(uint64 whitePawns, uint64 blackPieces);
-
-        uint64 blackPawnsAbleToCaptureEast(uint64 blackPawns, uint64 whitePieces);
-        uint64 blackPawnsAbleToCaptureWest(uint64 blackPawns, uint64 whitePieces);
-
-        void generateDirectedPawnCaptures(Position& position, int& i, Direction direction);
-
+        // Pawn attacks
+        uint64 arrPawnAttacks[2][64];
+        void precalculatePawnAttacks();
         void generatePawnCaptures(Position& position, int& i);
+
+        // KNIGHT MOVES
+        uint64 arrKnightMoves[64];
+        void precalculateKnightMoves();
+        void generateKnightMoves(Position& position, int& i);
 };
 
 #endif

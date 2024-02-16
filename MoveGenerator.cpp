@@ -4,44 +4,41 @@
 
 MoveGenerator::MoveGenerator() {
     precalculatePawnAttacks();
+    precalculateKnightMoves();
 }
 
 int MoveGenerator::generateMoves(Position &position) {
     int i = 0;
-    // Pawn pushes
+    // Pawn Moves | TODO: Add promotion
     generatePawnPushes(position, i);
-    // Pawn captures
     generatePawnCaptures(position, i);
+    // Knight Moves
+    generateKnightMoves(position, i);
     return i;
 }
 
-uint64 MoveGenerator::whitePawnsAbleToPush(uint64 whitePawns, uint64 empty) {
-    return soutOne(empty) & whitePawns;
+// PAWN MOVES
+// Pawn pushes
+uint64 MoveGenerator::pawnsAbleToPush(uint64 pawns, uint64 empty, Color color) {
+    return color == WHITE ? soutOne(empty) & pawns : nortOne(empty) & pawns;
 }
 
-uint64 MoveGenerator::blackPawnsAbleToPush(uint64 blackPawns, uint64 empty) {
-    return nortOne(empty) & blackPawns;
+uint64 MoveGenerator::pawnsAbleToDoublePush(uint64 pawns, uint64 empty, Color color) {
+    uint64 doublePushRank = (color == WHITE ? RANK_4 : RANK_5) & empty;
+    uint64 emptyRank = color == WHITE ? soutOne(doublePushRank) : nortOne(doublePushRank);
+    emptyRank &= empty;
+    return pawnsAbleToPush(pawns, emptyRank, color);
 }
 
-uint64 MoveGenerator::whitePawnsAbleToDoublePush(uint64 whitePawns, uint64 empty) {
-    uint64 emptyRank3 = soutOne(empty & RANK_4) & empty;
-    return whitePawnsAbleToPush(whitePawns, emptyRank3);
-}
-
-uint64 MoveGenerator::blackPawnsAbleToDoublePush(uint64 blackPawns, uint64 empty) {
-    uint64 emptyRank6 = nortOne(empty & RANK_5) & empty;
-    return blackPawnsAbleToPush(blackPawns, emptyRank6);
-}
-
-void MoveGenerator::generatePawnPush(uint64 pushes, int& i, Color color, bool isDoublePush) {
-    while (pushes) {
-        uint8 from = bitScanForward(pushes);
+void MoveGenerator::generatePawnPush(uint64 pawns, int& i, Color color, bool isDoublePush) {
+    while (pawns) {
+        uint8 from = bitScanForward(pawns);
         if (from == 0) break;
         uint8 to = from + (isDoublePush ? 16 : 8) * (color == WHITE ? 1 : -1);
         Move move = {from, to, NORMAL, EMPTY, EMPTY};
         legalMoves[i] = move;
         i++;
-        pushes &= pushes - 1;
+        pawns &= pawns - 1;
     }
 }
 
@@ -49,16 +46,17 @@ void MoveGenerator::generatePawnPushes(Position& position, int& i){
     if (position.getCurrentPlayer() == WHITE) {
         uint64 whitePawns = position.getBitboard(WHITE_PAWN);
         uint64 empty = position.getEmptySquares();
-        generatePawnPush(whitePawnsAbleToPush(whitePawns, empty), i, WHITE, false);
-        generatePawnPush(whitePawnsAbleToDoublePush(whitePawns, empty), i, WHITE, true);
+        generatePawnPush(pawnsAbleToPush(whitePawns, empty, WHITE), i, WHITE, false);
+        generatePawnPush(pawnsAbleToDoublePush(whitePawns, empty, WHITE), i, WHITE, true);
     } else {
         uint64 blackPawns = position.getBitboard(BLACK_PAWN);
         uint64 empty = position.getEmptySquares();
-        generatePawnPush(blackPawnsAbleToPush(blackPawns, empty), i, BLACK, false);
-        generatePawnPush(blackPawnsAbleToDoublePush(blackPawns, empty), i, BLACK, true);
+        generatePawnPush(pawnsAbleToPush(blackPawns, empty, BLACK), i, BLACK, false);
+        generatePawnPush(pawnsAbleToDoublePush(blackPawns, empty, BLACK), i, BLACK, true);
     }
 }
 
+// Pawn attacks
 void MoveGenerator::precalculatePawnAttacks() {
     for (int i = 0; i < 64; i++) {
         uint64 pawn = 1ULL << i;
@@ -79,9 +77,9 @@ void MoveGenerator::generatePawnCaptures(Position& position, int& i) {
             uint8 to = bitScanForward(attacks);
             Move move;
             if (to == position.getEnPassantTarget()) {
-                move = {from, to, EN_PASSANT, EMPTY, color == WHITE ? BLACK_PAWN : WHITE_PAWN};
+                move = {from, to, EN_PASSANT, color == WHITE ? BLACK_PAWN : WHITE_PAWN, EMPTY};
             } else {
-                move = {from, to, CAPTURE, EMPTY, position.getPieceAt(to)};
+                move = {from, to, CAPTURE, position.getPieceAt(to), EMPTY};
             }
             legalMoves[i] = move;
             i++;
@@ -90,4 +88,36 @@ void MoveGenerator::generatePawnCaptures(Position& position, int& i) {
         pawns &= pawns - 1;
     }
 }
-    
+
+// KNIGHT MOVES
+void MoveGenerator::precalculateKnightMoves() {
+    for (int i = 0; i < 64; i++) {
+        uint64 knight = 1ULL << i;
+        uint64 l1 = (knight >> 1) & 0x7F7F7F7F7F7F7F7FULL;
+        uint64 l2 = (knight >> 2) & 0x3F3F3F3F3F3F3F3FULL;
+        uint64 r1 = (knight << 1) & 0xFEFEFEFEFEFEFEFEULL;
+        uint64 r2 = (knight << 2) & 0xFCFCFCFCFCFCFCFCULL;
+        uint64 h1 = l1 | r1;
+        uint64 h2 = l2 | r2;
+        arrKnightMoves[i] = (h1 << 16) | (h1 >> 16) | (h2 << 8) | (h2 >> 8);
+    }
+}
+
+void MoveGenerator::generateKnightMoves(Position& position, int& i) {
+    Color color = position.getCurrentPlayer();
+    uint64 knights = color == WHITE ? position.getBitboard(WHITE_KNIGHT) : position.getBitboard(BLACK_KNIGHT);
+    uint64 friendlyPieces = color == WHITE ? position.getWhiteOccupiedSquares() : position.getBlackOccupiedSquares();
+    uint64 enemyPieces = color == WHITE ? position.getBlackOccupiedSquares() : position.getWhiteOccupiedSquares();
+    while (knights) {
+        uint8 from = bitScanForward(knights);
+        uint64 moves = arrKnightMoves[from] & ~friendlyPieces;
+        while (moves) {
+            uint8 to = bitScanForward(moves);
+            Move move = {from, to, position.getPieceAt(to) == EMPTY ? NORMAL : CAPTURE, position.getPieceAt(to), EMPTY};
+            legalMoves[i] = move;
+            i++;
+            moves &= moves - 1;
+        }
+        knights &= knights - 1;
+    }
+}
