@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include "Position.h"
 #include "MoveGenerator.h"
+#include <iostream>
 
 class MoveGeneratorTest : public ::testing::Test {
 protected:
@@ -17,6 +18,11 @@ protected:
         EXPECT_EQ(move.promotion, promotion);
     };
 };
+
+TEST_F(MoveGeneratorTest, startingPositionAmoutOfMoves) {
+    moveGenerator.generateMoves(startingPosition);
+    EXPECT_EQ(moveGenerator.generateMoves(startingPosition), 20);
+}
 
 TEST_F(MoveGeneratorTest, startingPositionPawnMoves) {
     moveGenerator.generateMoves(startingPosition);
@@ -36,11 +42,6 @@ TEST_F(MoveGeneratorTest, startingPositionKnightMoves) {
     assertEqualMove(moveGenerator.legalMoves[17], B1, C3, NORMAL, EMPTY, EMPTY);
     assertEqualMove(moveGenerator.legalMoves[18], G1, F3, NORMAL, EMPTY, EMPTY);
     assertEqualMove(moveGenerator.legalMoves[19], G1, H3, NORMAL, EMPTY, EMPTY);
-}
-
-TEST_F(MoveGeneratorTest, startingPositionAmoutOfMoves) {
-    moveGenerator.generateMoves(startingPosition);
-    EXPECT_EQ(moveGenerator.generateMoves(startingPosition), 20);
 }
 
 TEST_F(MoveGeneratorTest, e4BlackToMoveAmountOfMoves) {
@@ -68,7 +69,7 @@ TEST_F(MoveGeneratorTest, e4BlackToMoveKnightMoves) {
 }
 
 TEST_F(MoveGeneratorTest, arbitraryWhiteToMoveAmountOfMoves) {
-    EXPECT_EQ(moveGenerator.generateMoves(arbitraryWhiteToMovePosition), 18);
+    EXPECT_EQ(moveGenerator.generateMoves(arbitraryWhiteToMovePosition), 31);
 }
 
 TEST_F(MoveGeneratorTest, arbitraryWhiteToMovePawnMoves) {
@@ -101,8 +102,29 @@ TEST_F(MoveGeneratorTest, arbitraryWhiteToMoveKingMoves) {
     assertEqualMove(moveGenerator.legalMoves[17], G1, H2, NORMAL, EMPTY, EMPTY);
 }
 
+TEST_F(MoveGeneratorTest, arbitraryWhiteToMoveBishopMoves) {
+    moveGenerator.generateMoves(arbitraryWhiteToMovePosition);
+    assertEqualMove(moveGenerator.legalMoves[18], C1, B2, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[19], C1, D2, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[20], C1, A3, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[21], C1, E3, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[22], C1, F4, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[23], C1, G5, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[24], C1, H6, CAPTURE, BLACK_KNIGHT, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[25], C4, E2, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[26], C4, B3, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[27], C4, D3, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[28], C4, B5, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[29], C4, A6, CAPTURE, BLACK_KNIGHT, EMPTY);
+}
+
+TEST_F(MoveGeneratorTest, arbitraryWhiteToMoveRookMoves) {
+    moveGenerator.generateMoves(arbitraryWhiteToMovePosition);
+    assertEqualMove(moveGenerator.legalMoves[30], F1, E1, NORMAL, EMPTY, EMPTY);
+}
+
 TEST_F(MoveGeneratorTest, arbitraryBlackToMoveAmountOfMoves) {
-    EXPECT_EQ(moveGenerator.generateMoves(arbitraryBlackToMovePosition), 20);
+    EXPECT_EQ(moveGenerator.generateMoves(arbitraryBlackToMovePosition), 30);
 }
 
 TEST_F(MoveGeneratorTest, arbitraryBlackToMovePawnMoves) {
@@ -137,34 +159,52 @@ TEST_F(MoveGeneratorTest, arbitraryBlackToMoveKingMoves) {
     assertEqualMove(moveGenerator.legalMoves[19], C8, B8, NORMAL, EMPTY, EMPTY);
 }
 
+TEST_F(MoveGeneratorTest, arbitraryBlackToMoveBishopMoves) {
+    moveGenerator.generateMoves(arbitraryBlackToMovePosition);
+    assertEqualMove(moveGenerator.legalMoves[20], E6, H3, CAPTURE, WHITE_PAWN, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[21], E6, G4, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[22], E6, F5, NORMAL, EMPTY, EMPTY);
+}
+
+TEST_F(MoveGeneratorTest, arbitraryBlackToMoveRookMoves) {
+    moveGenerator.generateMoves(arbitraryBlackToMovePosition);
+    assertEqualMove(moveGenerator.legalMoves[23], D8, E8, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[24], D8, F8, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[25], D8, G8, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[26], H8, H7, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[27], H8, E8, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[28], H8, F8, NORMAL, EMPTY, EMPTY);
+    assertEqualMove(moveGenerator.legalMoves[29], H8, G8, NORMAL, EMPTY, EMPTY);
+}
+
 TEST_F(MoveGeneratorTest, whiteEnPassantLeftToRight) {
     Position whiteEnPassantLeftToRightPosition = Position("r1b1kb1r/2qn3p/p1n5/1pppPppP/3p4/NBP2N2/PP3PP1/R1BQ1RK1 w kq f6 0 15");
-    EXPECT_EQ(moveGenerator.generateMoves(whiteEnPassantLeftToRightPosition), 19);
+    EXPECT_EQ(moveGenerator.generateMoves(whiteEnPassantLeftToRightPosition), 29);
     assertEqualMove(moveGenerator.legalMoves[6], E5, F6, EN_PASSANT, BLACK_PAWN, EMPTY);
 }
 
 TEST_F(MoveGeneratorTest, whiteEnPassantRighToLeft) {
     Position whiteEnPassantRightToLeftPosition = Position("r1b1kb1r/2qn1p1p/p1np4/1pp3pP/3pP3/N1P2N2/PPB2PP1/R1BQ1RK1 w kq g6 0 13");
-    EXPECT_EQ(moveGenerator.generateMoves(whiteEnPassantRightToLeftPosition), 21);
+    EXPECT_EQ(moveGenerator.generateMoves(whiteEnPassantRightToLeftPosition), 31);
     assertEqualMove(moveGenerator.legalMoves[8], H5, G6, EN_PASSANT, BLACK_PAWN, EMPTY);
 }
 
 
 TEST_F(MoveGeneratorTest, blackEnPassantLeftToRight) {
     Position blackEnPassantLeftToRightPosition = Position("r1b1kb1r/pp3ppp/1qnp1n2/1B2p3/2pPP3/N1P2N1P/PP3PP1/R1BQ1RK1 b kq d3 0 8");
-    EXPECT_EQ(moveGenerator.generateMoves(blackEnPassantLeftToRightPosition), 24);
+    EXPECT_EQ(moveGenerator.generateMoves(blackEnPassantLeftToRightPosition), 32);
     assertEqualMove(moveGenerator.legalMoves[7], C4, D3, EN_PASSANT, WHITE_PAWN, EMPTY);
 }
 
 TEST_F(MoveGeneratorTest, blackEnPassantRightToLeft) {
     Position blackEnPassantRightToLeftPosition = Position("r1b1kb1r/pp3ppp/1qnp1n2/1B2p3/1Pp1P3/N1P2N1P/P2P1PP1/R1BQ1RK1 b kq b3 0 8");
-    EXPECT_EQ(moveGenerator.generateMoves(blackEnPassantRightToLeftPosition), 23);
+    EXPECT_EQ(moveGenerator.generateMoves(blackEnPassantRightToLeftPosition), 31);
     assertEqualMove(moveGenerator.legalMoves[7], C4, B3, EN_PASSANT, WHITE_PAWN, EMPTY);
 }
 
 TEST_F(MoveGeneratorTest, whitePawnPromotion) {
     Position whitePromotePosition = Position("r7/1kn2P2/1q6/8/2p5/4B3/6K1/5R2 w - - 0 1");
-    EXPECT_EQ(moveGenerator.generateMoves(whitePromotePosition), 11);
+    EXPECT_EQ(moveGenerator.generateMoves(whitePromotePosition), 33);
     assertEqualMove(moveGenerator.legalMoves[0], F7, F8, PROMOTION, EMPTY, WHITE_QUEEN);
     assertEqualMove(moveGenerator.legalMoves[1], F7, F8, PROMOTION, EMPTY, WHITE_ROOK);
     assertEqualMove(moveGenerator.legalMoves[2], F7, F8, PROMOTION, EMPTY, WHITE_BISHOP);
@@ -173,7 +213,7 @@ TEST_F(MoveGeneratorTest, whitePawnPromotion) {
 
 TEST_F(MoveGeneratorTest, whitePawnCapturePromotion) {
     Position whiteCapturePromotePosition = Position("r3r1b1/1kn2P2/nq6/5Q2/2p5/4B3/6K1/5R2 w - - 0 1");
-    EXPECT_EQ(moveGenerator.generateMoves(whiteCapturePromotePosition), 19);
+    EXPECT_EQ(moveGenerator.generateMoves(whiteCapturePromotePosition), 39);
     assertEqualMove(moveGenerator.legalMoves[0], F7, F8, PROMOTION, EMPTY, WHITE_QUEEN);
     assertEqualMove(moveGenerator.legalMoves[1], F7, F8, PROMOTION, EMPTY, WHITE_ROOK);
     assertEqualMove(moveGenerator.legalMoves[2], F7, F8, PROMOTION, EMPTY, WHITE_BISHOP);
@@ -231,7 +271,7 @@ TEST_F(MoveGeneratorTest, whiteKingMovesAndCaptures) {
 
 TEST_F(MoveGeneratorTest, blackKingMovesAndCaptures) {
     Position blackKingCapturePosition = Position("4r3/4kp2/3PnB2/8/2Q5/1K6/8/8 b - - 0 1");
-    EXPECT_EQ(moveGenerator.generateMoves(blackKingCapturePosition), 13);
+    EXPECT_EQ(moveGenerator.generateMoves(blackKingCapturePosition), 20);
     assertEqualMove(moveGenerator.legalMoves[8], E7, D6, CAPTURE, WHITE_PAWN, EMPTY);
     assertEqualMove(moveGenerator.legalMoves[9], E7, F6, CAPTURE, WHITE_BISHOP, EMPTY);
     assertEqualMove(moveGenerator.legalMoves[10], E7, D7, NORMAL, EMPTY, EMPTY);

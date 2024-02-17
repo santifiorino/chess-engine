@@ -1,9 +1,6 @@
 #include "Position.h"
 
 void Position::initializeBoard() {
-    for (int i = 0; i < 64; i++) {
-        board[i] = EMPTY;
-    }
     for (int i = 0; i < 12; i++) {
         bitboards[i] = 0;
     }
@@ -43,7 +40,6 @@ void Position::parsePiecePlacement(const char* FEN, int& i){
             continue;
         }
         Piece piece = charToPiece(FEN[i]);
-        board[toBoardIndex(file, rank)] = piece;
         bitboards[piece] |= (1ULL << toBoardIndex(file, rank));
         rank++;
         i++;
@@ -109,7 +105,20 @@ Position::Position(char* FEN) {
 }
 
 Piece Position::getPieceAt(int square) {
-    return board[square];
+    if (bitboards[WHITE_PAWN] & setBit(0ULL, square)) return WHITE_PAWN;
+    if (bitboards[WHITE_KNIGHT] & setBit(0ULL, square)) return WHITE_KNIGHT;
+    if (bitboards[WHITE_BISHOP] & setBit(0ULL, square)) return WHITE_BISHOP;
+    if (bitboards[WHITE_ROOK] & setBit(0ULL, square)) return WHITE_ROOK;
+    if (bitboards[WHITE_QUEEN] & setBit(0ULL, square)) return WHITE_QUEEN;
+    if (bitboards[WHITE_KING] & setBit(0ULL, square)) return WHITE_KING;
+
+    if (bitboards[BLACK_PAWN] & setBit(0ULL, square)) return BLACK_PAWN;
+    if (bitboards[BLACK_KNIGHT] & setBit(0ULL, square)) return BLACK_KNIGHT;
+    if (bitboards[BLACK_BISHOP] & setBit(0ULL, square)) return BLACK_BISHOP;
+    if (bitboards[BLACK_ROOK] & setBit(0ULL, square)) return BLACK_ROOK;
+    if (bitboards[BLACK_QUEEN] & setBit(0ULL, square)) return BLACK_QUEEN;
+
+    return EMPTY;
 }
 
 U64 Position::getBitboard(Piece piece) {

@@ -26,8 +26,6 @@ public:
     U64 getEmptySquares();
     
 private:
-    // Square centric board representation
-    Piece board[64]; // A1 = 0, H8 = 63
     // Bitboard representation
     U64 bitboards[12]; // A1 = Least significant bit, H8 = Most significant bit
 

@@ -25,6 +25,24 @@ enum Color {
     BLACK
 };
 
+enum MoveType {
+    NORMAL,
+    CAPTURE,
+    EN_PASSANT,
+    CASTLE_KINGSIDE,
+    CASTLE_QUEENSIDE,
+    PROMOTION,
+    PROMOTION_CAPTURE
+};
+
+struct Move {
+    U8 from;
+    U8 to;
+    MoveType type;
+    Piece captured;
+    Piece promotion;
+};
+
 enum AlgebraicNotation {
     A1, B1, C1, D1, E1, F1, G1, H1,
     A2, B2, C2, D2, E2, F2, G2, H2,
@@ -34,17 +52,6 @@ enum AlgebraicNotation {
     A6, B6, C6, D6, E6, F6, G6, H6,
     A7, B7, C7, D7, E7, F7, G7, H7,
     A8, B8, C8, D8, E8, F8, G8, H8
-};
-
-enum Direction {
-    NORTH_WEST = 7,
-    NORTH = 8,
-    NORTH_EAST = 9,
-    WEST = -1,
-    EAST = 1,
-    SOUTH_WEST = -9,
-    SOUTH = -8,
-    SOUTH_EAST = -7
 };
 
 const U64 RANK_1 = 0xFF;
@@ -65,6 +72,17 @@ const U64 FILE_F = 0x2020202020202020;
 const U64 FILE_G = 0x4040404040404040;
 const U64 FILE_H = 0x8080808080808080;
 
+enum Direction {
+    NORTH_WEST = 7,
+    NORTH = 8,
+    NORTH_EAST = 9,
+    WEST = -1,
+    EAST = 1,
+    SOUTH_WEST = -9,
+    SOUTH = -8,
+    SOUTH_EAST = -7
+};
+
 U64 soutOne (U64 b);
 U64 nortOne (U64 b);
 const U64 notAFile = 0xFEFEFEFEFEFEFEFE;
@@ -76,7 +94,6 @@ U64 westOne (U64 b);
 U64 soWeOne (U64 b);
 U64 noWeOne (U64 b);
 
-// file and rank to array index
 inline int toBoardIndex(int file, int rank) {
     return file * 8 + rank;
 }
@@ -121,5 +138,19 @@ const int index64[64] = {
 };
 
 int bitScanForward(U64 bb);
+
+int countOnes(U64 b);
+
+// Pseudorandom number generator
+class RandomNumberGenerator {
+private:
+    unsigned int seed;
+
+public:
+    RandomNumberGenerator(unsigned int seed) : seed(seed) {}
+    unsigned int generateRandomU32();
+    U64 generateRandomU64();
+    U64 generateRandomU64FewBits();
+};
 
 #endif
