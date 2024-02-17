@@ -92,7 +92,6 @@ void MoveGenerator::generatePawnCaptures(Position& position, int& i) {
         U64 attacks = arrPawnAttacks[color][from] & enemyPieces;
         while (attacks) {
             U8 to = bitScanForward(attacks);
-            Move move;
             if (to == position.getEnPassantTarget()) {
                 addMove(i, from, to, EN_PASSANT, color == WHITE ? BLACK_PAWN : WHITE_PAWN, EMPTY);
             } else {
@@ -213,7 +212,7 @@ U64 MoveGenerator::maskRook(int square) {
     return mask;
 }
 
-U64 MoveGenerator::getBishopAttackOnTheFly(int square, U64 occupancy) {
+U64 MoveGenerator::getBishopMovesMapOnTheFly(int square, U64 occupancy) {
     U64 attack = 0ULL;
     int r, f;
     int tr = square / 8;
@@ -237,6 +236,36 @@ U64 MoveGenerator::getBishopAttackOnTheFly(int square, U64 occupancy) {
     for (r = tr - 1, f = tf - 1; r >= 1 && f >= 1; r--, f--) {
         attack = setBit(attack, toBoardIndex(r, f));
         if (getBit(occupancy, toBoardIndex(r, f))) break;
+    }
+
+    return attack;
+}
+
+U64 MoveGenerator::getRookMovesMapOnTheFly(int square, U64 occupancy) {
+    U64 attack = 0ULL;
+    int r, f;
+    int tr = square / 8;
+    int tf = square % 8;
+
+    // North Rays
+    for (r = tr + 1; r <= 6; r++) {
+        attack = setBit(attack, toBoardIndex(r, tf));
+        if (getBit(occupancy, toBoardIndex(r, tf))) break;
+    }
+    // South Rays
+    for (r = tr - 1; r >= 1; r--) {
+        attack = setBit(attack, toBoardIndex(r, tf));
+        if (getBit(occupancy, toBoardIndex(r, tf))) break;
+    }
+    // East Rays
+    for (f = tf + 1; f <= 6; f++) {
+        attack = setBit(attack, toBoardIndex(tr, f));
+        if (getBit(occupancy, toBoardIndex(tr, f))) break;
+    }
+    // West Rays
+    for (f = tf - 1; f >= 1; f--) {
+        attack = setBit(attack, toBoardIndex(tr, f));
+        if (getBit(occupancy, toBoardIndex(tr, f))) break;
     }
 
     return attack;

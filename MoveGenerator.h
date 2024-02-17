@@ -27,6 +27,7 @@ class MoveGenerator {
         MoveGenerator();
         Move legalMoves[218];
         int generateMoves(Position &position);
+
     private:
         void addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, Piece promotion);
         // PAWN MOVES
@@ -58,7 +59,8 @@ class MoveGenerator {
         U64 maskBishop(int square);
         U64 maskRook(int square);
         // Bishop and Rook attacks on the fly (slow, only for magic number generation)
-        U64 getBishopAttackOnTheFly(int square, U64 occupancy);
+        U64 getBishopMovesMapOnTheFly(int square, U64 occupancy);
+        U64 getRookMovesMapOnTheFly(int square, U64 occupancy);
 };
 
 #endif
