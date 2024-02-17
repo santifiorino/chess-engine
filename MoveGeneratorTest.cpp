@@ -9,7 +9,7 @@ protected:
     Position arbitraryWhiteToMovePosition = Position("r1bqk2r/ppp4p/n2p1ppn/2bPp3/1PB1P3/2P2N1P/P4PP1/RNBQ1RK1 w kq - 0 10");
     Position arbitraryBlackToMovePosition = Position("2kr3r/pppq1p2/2n1bn1p/3pp1p1/B3P3/1P1P1N1P/P1PB1PP1/R2Q1RK1 b - - 0 13");
     MoveGenerator moveGenerator;
-    void assertEqualMove(Move move, uint8 from, uint8 to, MoveType type, Piece captured, Piece promotion) {
+    void assertEqualMove(Move move, U8 from, U8 to, MoveType type, Piece captured, Piece promotion) {
         EXPECT_EQ(move.from, from);
         EXPECT_EQ(move.to, to);
         EXPECT_EQ(move.type, type);

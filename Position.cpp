@@ -112,7 +112,7 @@ Piece Position::getPieceAt(int square) {
     return board[square];
 }
 
-uint64 Position::getBitboard(Piece piece) {
+U64 Position::getBitboard(Piece piece) {
     return bitboards[piece];
 }
 
@@ -136,30 +136,30 @@ bool Position::blackCanCastleQueenside() {
     return castlingAbility & 8;
 }
 
-uint8 Position::getEnPassantTarget() {
+U8 Position::getEnPassantTarget() {
     return enPassantTargetSquare;
 }
 
-uint8 Position::getHalfmoveClock() {
+U8 Position::getHalfmoveClock() {
     return halfmoveClock;
 }
 
-uint8 Position::getFullmoveCounter() {
+U8 Position::getFullmoveCounter() {
     return fullmoveCounter;
 }
 
-uint64 Position::getBlackOccupiedSquares() {
+U64 Position::getBlackOccupiedSquares() {
     return getBitboard(BLACK_PAWN) | getBitboard(BLACK_KNIGHT) | getBitboard(BLACK_BISHOP) | getBitboard(BLACK_ROOK) | getBitboard(BLACK_QUEEN) | getBitboard(BLACK_KING);
 }
 
-uint64 Position::getWhiteOccupiedSquares() {
+U64 Position::getWhiteOccupiedSquares() {
     return getBitboard(WHITE_PAWN) | getBitboard(WHITE_KNIGHT) | getBitboard(WHITE_BISHOP) | getBitboard(WHITE_ROOK) | getBitboard(WHITE_QUEEN) | getBitboard(WHITE_KING);
 }
 
-uint64 Position::getOccupiedSquares() {
+U64 Position::getOccupiedSquares() {
     return getBlackOccupiedSquares() | getWhiteOccupiedSquares();
 }
 
-uint64 Position::getEmptySquares() {
+U64 Position::getEmptySquares() {
     return ~getOccupiedSquares();
 }

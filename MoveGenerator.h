@@ -15,8 +15,8 @@ enum MoveType {
 };
 
 struct Move {
-    uint8 from;
-    uint8 to;
+    U8 from;
+    U8 to;
     MoveType type;
     Piece captured;
     Piece promotion;
@@ -28,27 +28,37 @@ class MoveGenerator {
         Move legalMoves[218];
         int generateMoves(Position &position);
     private:
-        void addMove(int& i, uint8 from, uint8 to, MoveType type, Piece captured, Piece promotion);
+        void addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, Piece promotion);
         // PAWN MOVES
         // Pawn pushes
-        uint64 pawnsAbleToPush(uint64 pawns, uint64 empty, Color color);
-        uint64 pawnsAbleToDoublePush(uint64 pawns, uint64 empty, Color color);
-        void generatePawnPush(uint64 pushes, int& i, Color color, bool isDoublePush);
+        U64 getPawnsAbleToPush(U64 pawns, U64 empty, Color color);
+        U64 getPawnsAbleToDoublePush(U64 pawns, U64 empty, Color color);
+        void generatePawnPush(U64 pushes, int& i, Color color, bool isDoublePush);
         void generatePawnPushes(Position& position, int& i);
         // Pawn attacks
-        uint64 arrPawnAttacks[2][64];
+        U64 arrPawnAttacks[2][64];
         void precalculatePawnAttacks();
         void generatePawnCaptures(Position& position, int& i);
 
         // KNIGHT MOVES
-        uint64 arrKnightMoves[64];
+        U64 arrKnightMoves[64];
         void precalculateKnightMoves();
         void generateKnightMoves(Position &position, int &i);
 
         // KING MOVES
-        uint64 arrKingMoves[64];
+        U64 arrKingMoves[64];
         void precalculateKingMoves();
         void generateKingMoves(Position &position, int &i);
+
+        // SLIDING PIECES
+        // Mask relevant occupancy bits to form a key for magic bitboards
+        U64 bishopRelevantOccupancyMask[64];
+        U64 rookRelevantOccupancyMask[64];
+        void generateMasks();
+        U64 maskBishop(int square);
+        U64 maskRook(int square);
+        // Bishop and Rook attacks on the fly (slow, only for magic number generation)
+        U64 getBishopAttackOnTheFly(int square, U64 occupancy);
 };
 
 #endif

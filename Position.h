@@ -9,33 +9,33 @@ public:
 
     // Accessing the position
     Piece getPieceAt(int square);
-    uint64 getBitboard(Piece piece);
+    U64 getBitboard(Piece piece);
     Color getCurrentPlayer();
     bool whiteCanCastleKingside();
     bool whiteCanCastleQueenside();
     bool blackCanCastleKingside();
     bool blackCanCastleQueenside();
-    uint8 getEnPassantTarget();
-    uint8 getHalfmoveClock();
-    uint8 getFullmoveCounter();
+    U8 getEnPassantTarget();
+    U8 getHalfmoveClock();
+    U8 getFullmoveCounter();
 
     // Bitboard
-    uint64 getBlackOccupiedSquares();
-    uint64 getWhiteOccupiedSquares();
-    uint64 getOccupiedSquares();
-    uint64 getEmptySquares();
+    U64 getBlackOccupiedSquares();
+    U64 getWhiteOccupiedSquares();
+    U64 getOccupiedSquares();
+    U64 getEmptySquares();
     
 private:
     // Square centric board representation
     Piece board[64]; // A1 = 0, H8 = 63
     // Bitboard representation
-    uint64 bitboards[12]; // A1 = Least significant bit, H8 = Most significant bit
+    U64 bitboards[12]; // A1 = Least significant bit, H8 = Most significant bit
 
     Color currentPlayer;
-    uint8 castlingAbility; // (0000 qkQK)
-    uint8 enPassantTargetSquare;
-    uint8 halfmoveClock;
-    uint8 fullmoveCounter;
+    U8 castlingAbility; // (0000 qkQK)
+    U8 enPassantTargetSquare;
+    U8 halfmoveClock;
+    U8 fullmoveCounter;
 
     // Board initialization
     void initializeBoard();
