@@ -12,8 +12,8 @@ MoveGenerator::MoveGenerator() {
     // Sliding Pieces
     generateRelevantOccupancyMasks();
     // precalculateMagicNumbers();
-    precalculateSliderMoves(true);
-    precalculateSliderMoves(false);
+    precalculateSliderMoves(BISHOP);
+    precalculateSliderMoves(ROOK);
 }
 
 int MoveGenerator::generateMoves(Position &position) {
@@ -25,9 +25,10 @@ int MoveGenerator::generateMoves(Position &position) {
     generateKnightMoves(position, i);
     // King
     generateKingMoves(position, i);
-    // Bishop
-    generateSliderMoves(position, i, true);
-    generateSliderMoves(position, i, false);
+    // Sliding Pieces
+    generateSliderMoves(position, i, BISHOP);
+    generateSliderMoves(position, i, ROOK);
+    generateSliderMoves(position, i, QUEEN);
     return i;
 }
 
@@ -273,17 +274,17 @@ U64 MoveGenerator::getOccupancyByIndex(int index, U64 mask) {
     return occupancy;
 };
 
-U64 MoveGenerator::findMagicNumber(int square, bool isBishop) {
+U64 MoveGenerator::findMagicNumber(int square, PieceType pieceType) {
     U64 occupancies[4096], attacks[4096], usedAttacks[4096];
     RandomNumberGenerator rng = RandomNumberGenerator(1804289383);
 
-    U64 attackMask = isBishop ? arrBishopOccupancyMask[square] : arrRookOccupancyMask[square];
+    U64 attackMask = (pieceType == BISHOP) ? arrBishopOccupancyMask[square] : arrRookOccupancyMask[square];
     int relevantBits = countOnes(attackMask);
 
     for (int i = 0; i < (1 << relevantBits); i++) {
         occupancies[i] = getOccupancyByIndex(i, attackMask);
-        attacks[i] = isBishop ? bishopMovesMapOnTheFly(square, occupancies[i]) :
-                                  rookMovesMapOnTheFly(square, occupancies[i]);
+        attacks[i] = (pieceType == BISHOP) ? bishopMovesMapOnTheFly(square, occupancies[i]) :
+                                             rookMovesMapOnTheFly(square, occupancies[i]);
     }
     for (int iterations = 0; iterations < 100000000; iterations++) {
         U64 magic = rng.generateRandomU64FewBits();
@@ -302,18 +303,18 @@ U64 MoveGenerator::findMagicNumber(int square, bool isBishop) {
 
 void MoveGenerator::precalculateMagicNumbers() {
     for (int i = 0; i < 64; i++) {
-        arrBishopMagicNumbers[i] = findMagicNumber(i, true);
-        arrRookMagicNumbers[i] = findMagicNumber(i, false);
+        arrBishopMagicNumbers[i] = findMagicNumber(i, BISHOP);
+        arrRookMagicNumbers[i] = findMagicNumber(i, ROOK);
     }
 }
 
-void MoveGenerator::precalculateSliderMoves(bool isBishop) {
+void MoveGenerator::precalculateSliderMoves(PieceType pieceType) {
     for (int i = 0; i < 64; i++) {
-        U64 attackMask = isBishop ? arrBishopOccupancyMask[i] : arrRookOccupancyMask[i];
-        int relevantBitsCount = isBishop ? arrBishopRelevantBits[i] : arrRookRelevantBits[i];
+        U64 attackMask = (pieceType == BISHOP) ? arrBishopOccupancyMask[i] : arrRookOccupancyMask[i];
+        int relevantBitsCount = (pieceType == BISHOP) ? arrBishopRelevantBits[i] : arrRookRelevantBits[i];
         for (int index = 0; index < 1 << relevantBitsCount; index++) {
             U64 occupancy = getOccupancyByIndex(index, attackMask);
-            if (isBishop) {
+            if (pieceType == BISHOP) {
                 int magicIndex = (int) ((occupancy * arrBishopMagicNumbers[i]) >> (64 - relevantBitsCount));
                 arrBishopMoves[i][magicIndex] = bishopMovesMapOnTheFly(i, occupancy);
             } else {
@@ -324,21 +325,25 @@ void MoveGenerator::precalculateSliderMoves(bool isBishop) {
     }
 }
 
-void MoveGenerator::generateSliderMoves(Position& position, int& i, bool isBishop) {
-    U64 pieces = isBishop ? position.getFriendlyPieces(BISHOP) : position.getFriendlyPieces(ROOK);
+void MoveGenerator::generateSliderMoves(Position& position, int& i, PieceType pieceType) {
     U64 friendlyPieces = position.getFriendlyPieces();
+    U64 pieces = position.getFriendlyPieces(pieceType);
     while (pieces) {
         U8 from = bitScanForward(pieces);
-        U64 occupancy = position.getOccupiedSquares();
-        occupancy &= isBishop ? arrBishopOccupancyMask[from] : arrRookOccupancyMask[from];
+        U64 occupancy;
         int magicIndex;
-        U64 moves;
-        if (isBishop) {
+        U64 moves = 0ULL;
+        if (pieceType == BISHOP || pieceType == QUEEN) {
+            occupancy = position.getOccupiedSquares();
+            occupancy &= arrBishopOccupancyMask[from];
             magicIndex = (int) ((occupancy * arrBishopMagicNumbers[from]) >> (64 - arrBishopRelevantBits[from]));
             moves = arrBishopMoves[from][magicIndex] & ~friendlyPieces;
-        } else {
+        }
+        if (pieceType == ROOK || pieceType == QUEEN) {
+            occupancy = position.getOccupiedSquares();
+            occupancy &= arrRookOccupancyMask[from];
             magicIndex = (int) ((occupancy * arrRookMagicNumbers[from]) >> (64 - arrRookRelevantBits[from]));
-            moves = arrRookMoves[from][magicIndex] & ~friendlyPieces;
+            moves |= arrRookMoves[from][magicIndex] & ~friendlyPieces;
         }
         while (moves) {
             U8 to = bitScanForward(moves);
@@ -348,4 +353,3 @@ void MoveGenerator::generateSliderMoves(Position& position, int& i, bool isBisho
         pieces &= pieces - 1;
     }
 }
-
