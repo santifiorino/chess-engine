@@ -1,15 +1,15 @@
-#ifndef MOVE_GENERATOR_H
-#define MOVE_GENERATOR_H
+#ifndef MOVEGENERATOR_H
+#define MOVEGENERATOR_H
 
-#include "Utils.h"
-#include "Position.h"
+#include "../Utils.h"
+#include "../Position/Position.h"
 
 class MoveGenerator {
     public:
         MoveGenerator();
         Move legalMoves[218];
         int generateMoves(Position &position);
-        bool isSquareAttacked(Position &position, U8 square, Color color);
+        bool isSquareAttackedByColor(Position &position, U8 square, Color color);
 
     private:
         void addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, PieceType promotion);
@@ -73,7 +73,7 @@ class MoveGenerator {
         U64 rookMovesMapOnTheFly(int square, U64 occupancy);
         // Generating occupancy variations for bishop and rook masks
         // It's essentially counting in binary from 0 to 2^relevantBits in the mask
-        U64 getOccupancyByIndex(int index, U64 mask);
+        U64 placeNumberInMask(int index, U64 mask);
         // Generating magic numbers!
         U64 findMagicNumber(int square, PieceType pieceType);
         void precalculateMagicNumbers();
@@ -108,6 +108,10 @@ class MoveGenerator {
         void generateSliderMoves(Position &position, int &i, PieceType pieceType);
 
         // CASTLING
+        bool whiteCanKingsideCastle(Position &position);
+        bool whiteCanQueensideCastle(Position &position);
+        bool blackCanKingsideCastle(Position &position);
+        bool blackCanQueensideCastle(Position &position);
         void generateCastlingMoves(Position &position, int &i);
 };
 

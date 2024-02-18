@@ -1,24 +1,23 @@
 #ifndef POSITION_H
 #define POSITION_H
 
-#include "Utils.h"
+#include "../Utils.h"
 
 class Position {
 public:
     Position(char* FEN);
 
-    // Accessing the position
+    // Position accessing
     Piece getPieceAt(int square);
     Color getCurrentPlayer();
-    bool whiteCanCastleKingside();
-    bool whiteCanCastleQueenside();
-    bool blackCanCastleKingside();
-    bool blackCanCastleQueenside();
+    bool whiteCanKingsideCastle();
+    bool whiteCanQueensideCastle();
+    bool blackCanKingsideCastle();
+    bool blackCanQueensideCastle();
     U8 getEnPassantTarget();
     U8 getHalfmoveClock();
     U8 getFullmoveCounter();
 
-    // Bitboard
     U64 getOccupiedSquares(Piece piece);
     U64 getOccupiedSquares(Color color);
     U64 getOccupiedSquares();
@@ -40,10 +39,11 @@ private:
     U8 halfmoveClock;
     U8 fullmoveCounter;
 
-    // Board initialization
-    void initializeBoard();
+    // Position FEN parsing
+    void initializeBoards();
     Piece charToPiece(char fenChar);
     void parsePiecePlacement(const char* FEN, int& i);
+    void parsePlayer(const char* FEN, int& i);
     void parseCastlingAbility(const char* FEN, int& i);
     void parseEnPassantTarget(const char* FEN, int& i);
     void parseHalfmoveClock(const char* FEN, int& i);

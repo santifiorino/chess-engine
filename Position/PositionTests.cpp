@@ -44,10 +44,10 @@ TEST_F(PositionTest, StartingPositionPlayer) {
 }
 
 TEST_F(PositionTest, StartingPositionCastlingRights) {
-    EXPECT_EQ(startingPosition.whiteCanCastleKingside(), true);
-    EXPECT_EQ(startingPosition.whiteCanCastleQueenside(), true);
-    EXPECT_EQ(startingPosition.blackCanCastleKingside(), true);
-    EXPECT_EQ(startingPosition.blackCanCastleQueenside(), true);
+    EXPECT_EQ(startingPosition.whiteCanKingsideCastle(), true);
+    EXPECT_EQ(startingPosition.whiteCanQueensideCastle(), true);
+    EXPECT_EQ(startingPosition.blackCanKingsideCastle(), true);
+    EXPECT_EQ(startingPosition.blackCanQueensideCastle(), true);
 }
 
 TEST_F(PositionTest, StartingPositionEnPassantTarget) {

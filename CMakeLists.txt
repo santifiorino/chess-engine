@@ -17,30 +17,39 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 add_executable(
-  PositionTest
-  PositionTest.cpp
-  Position.cpp
+  PositionTests
+  Position/PositionTests.cpp
+  Position/Position.cpp
+  Position/PositionFenParser.cpp
+  Position/PositionAccessing.cpp
   Utils.cpp
 )
 
 target_link_libraries(
-  PositionTest
+  PositionTests
   GTest::gtest_main
 )
 
 add_executable(
-  MoveGeneratorTest
-  MoveGeneratorTest.cpp
-  MoveGenerator.cpp
-  Position.cpp
+  MoveGeneratorTests
+  MoveGenerator/MoveGeneratorTests.cpp
+  MoveGenerator/MoveGenerator.cpp
+  MoveGenerator/MoveGeneratorPawns.cpp
+  MoveGenerator/MoveGeneratorKnights.cpp
+  MoveGenerator/MoveGeneratorMagic.cpp
+  MoveGenerator/MoveGeneratorSliders.cpp
+  MoveGenerator/MoveGeneratorKing.cpp
+  Position/Position.cpp
+  Position/PositionFenParser.cpp
+  Position/PositionAccessing.cpp
   Utils.cpp
 )
 
 target_link_libraries(
-  MoveGeneratorTest
+  MoveGeneratorTests
   GTest::gtest_main
 )
 
 include(GoogleTest)
-gtest_discover_tests(PositionTest)
-gtest_discover_tests(MoveGeneratorTest)
+gtest_discover_tests(PositionTests)
+gtest_discover_tests(MoveGeneratorTests)

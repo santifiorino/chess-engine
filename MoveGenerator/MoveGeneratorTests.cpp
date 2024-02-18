@@ -30,7 +30,7 @@ TEST_F(MoveGeneratorTest, startingPositionPawnMoves) {
     }
     for (int i = 8; i < 16; i++) {
         Move move = moveGenerator.legalMoves[i];
-        assertEqualMove(move, i, i+16, NORMAL, NOPIECE, NOTYPE);
+        assertEqualMove(move, i, i+16, DOUBLE_PAWN_PUSH, NOPIECE, NOTYPE);
     }
 }
 
@@ -54,7 +54,7 @@ TEST_F(MoveGeneratorTest, e4BlackToMovePawnMoves) {
     }
     for (int i = 8; i < 16; i++) {
         Move move = moveGenerator.legalMoves[i];
-        assertEqualMove(move, i+40, i+24, NORMAL, NOPIECE, NOTYPE);
+        assertEqualMove(move, i+40, i+24, DOUBLE_PAWN_PUSH, NOPIECE, NOTYPE);
     }
 }
 
@@ -76,8 +76,8 @@ TEST_F(MoveGeneratorTest, arbitraryWhiteToMovePawnMoves) {
     assertEqualMove(moveGenerator.legalMoves[1], G2, G3, NORMAL, NOPIECE, NOTYPE);
     assertEqualMove(moveGenerator.legalMoves[2], H3, H4, NORMAL, NOPIECE, NOTYPE);
     assertEqualMove(moveGenerator.legalMoves[3], B4, B5, NORMAL, NOPIECE, NOTYPE);
-    assertEqualMove(moveGenerator.legalMoves[4], A2, A4, NORMAL, NOPIECE, NOTYPE);
-    assertEqualMove(moveGenerator.legalMoves[5], G2, G4, NORMAL, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[4], A2, A4, DOUBLE_PAWN_PUSH, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[5], G2, G4, DOUBLE_PAWN_PUSH, NOPIECE, NOTYPE);
     assertEqualMove(moveGenerator.legalMoves[6], B4, C5, CAPTURE, BLACK_BISHOP, NOTYPE);
 }
 
@@ -139,14 +139,14 @@ TEST_F(MoveGeneratorTest, arbitraryBlackToMoveAmountOfMoves) {
 
 TEST_F(MoveGeneratorTest, arbitraryBlackToMovePawnMoves) {
     moveGenerator.generateMoves(arbitraryBlackToMovePosition);
-    assertEqualMove(moveGenerator.legalMoves[0], 35, 27, NORMAL, NOPIECE, NOTYPE);
-    assertEqualMove(moveGenerator.legalMoves[1], 38, 30, NORMAL, NOPIECE, NOTYPE);
-    assertEqualMove(moveGenerator.legalMoves[2], 47, 39, NORMAL, NOPIECE, NOTYPE);
-    assertEqualMove(moveGenerator.legalMoves[3], 48, 40, NORMAL, NOPIECE, NOTYPE);
-    assertEqualMove(moveGenerator.legalMoves[4], 49, 41, NORMAL, NOPIECE, NOTYPE);
-    assertEqualMove(moveGenerator.legalMoves[5], 48, 32, NORMAL, NOPIECE, NOTYPE);
-    assertEqualMove(moveGenerator.legalMoves[6], 49, 33, NORMAL, NOPIECE, NOTYPE);
-    assertEqualMove(moveGenerator.legalMoves[7], 35, 28, CAPTURE, WHITE_PAWN, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[0], D5, D4, NORMAL, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[1], G5, G4, NORMAL, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[2], H6, H5, NORMAL, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[3], A7, A6, NORMAL, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[4], B7, B6, NORMAL, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[5], A7, A5, DOUBLE_PAWN_PUSH, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[6], B7, B5, DOUBLE_PAWN_PUSH, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[7], D5, E4, CAPTURE, WHITE_PAWN, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, arbitraryBlackToMoveKnightMoves) {
@@ -299,20 +299,20 @@ TEST_F(MoveGeneratorTest, blackKingMovesAndCaptures) {
 TEST_F(MoveGeneratorTest, whiteKingSideCastle) {
     Position whiteKingSideCastle = Position("r1bqk1nr/pppp2pp/n4p2/2bPp3/2B1P3/2P2N2/PP3PPP/RNBQK2R w KQkq - 3 7");
     EXPECT_EQ(moveGenerator.generateMoves(whiteKingSideCastle), 41);
-    assertEqualMove(moveGenerator.legalMoves[40], E1, G1, CASTLE_KINGSIDE, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[40], E1, G1, KINGSIDE_CASTLE, NOPIECE, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, whiteQueenSideCastle) {
     Position whiteQueenSideCastle = Position("rnbk1b1Q/ppppqp1p/5np1/8/4P3/2NPB3/PPP2PPP/R3KBNR w KQ - 5 8");
     EXPECT_EQ(moveGenerator.generateMoves(whiteQueenSideCastle), 43);
-    assertEqualMove(moveGenerator.legalMoves[42], E1, C1, CASTLE_QUEENSIDE, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[42], E1, C1, QUEENSIDE_CASTLE, NOPIECE, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, whiteCastleBothWays) {
     Position whiteCastleBothWays = Position("2bqkb1r/rpp2ppp/p1np4/4p2n/3PP3/2NBBN2/PPP1QPPP/R3K2R w KQk - 4 8");
     EXPECT_EQ(moveGenerator.generateMoves(whiteCastleBothWays), 41);
-    assertEqualMove(moveGenerator.legalMoves[39], E1, G1, CASTLE_KINGSIDE, NOPIECE, NOTYPE);
-    assertEqualMove(moveGenerator.legalMoves[40], E1, C1, CASTLE_QUEENSIDE, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[39], E1, G1, KINGSIDE_CASTLE, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[40], E1, C1, QUEENSIDE_CASTLE, NOPIECE, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, whiteKingSideCastleUnderAttack) {
@@ -324,21 +324,21 @@ TEST_F(MoveGeneratorTest, whiteKingSideCastleUnderAttack) {
 TEST_F(MoveGeneratorTest, blackKingSideCastle) {
     Position blackKingSideCastle = Position("rnbqk2r/pppp1ppp/3b1n2/4p3/2B5/4PQ2/PPPPNPPP/RNB1K2R b KQkq - 5 4");
     EXPECT_EQ(moveGenerator.generateMoves(blackKingSideCastle), 29);
-    assertEqualMove(moveGenerator.legalMoves[28], E8, G8, CASTLE_KINGSIDE, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[28], E8, G8, KINGSIDE_CASTLE, NOPIECE, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, blackQueenSideCastle) {
     Position blackQueenSideCastle = Position("r3k1r1/p1ppqppp/bpnb1n2/4p3/2B5/2NPP1Q1/PPP2PPP/RNBK2R1 b q - 3 9");
     EXPECT_EQ(moveGenerator.generateMoves(blackQueenSideCastle), 33);
-    assertEqualMove(moveGenerator.legalMoves[32], E8, C8, CASTLE_QUEENSIDE, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[32], E8, C8, QUEENSIDE_CASTLE, NOPIECE, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, blackCastleBothWays) {
     Position blackCastleBothWays = Position("r3k2r/ppp1pp1p/2q1bnpb/3p4/3P4/1PP1P1PP/P3BP2/RNB1K1NR b KQkq - 0 9");
     EXPECT_EQ(moveGenerator.generateMoves(blackCastleBothWays), 39);
     // 5+5+10+5+9+3+2
-    assertEqualMove(moveGenerator.legalMoves[37], E8, G8, CASTLE_KINGSIDE, NOPIECE, NOTYPE);
-    assertEqualMove(moveGenerator.legalMoves[38], E8, C8, CASTLE_QUEENSIDE, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[37], E8, G8, KINGSIDE_CASTLE, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[38], E8, C8, QUEENSIDE_CASTLE, NOPIECE, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, blackQueenSideCastleUnderAttack) {
