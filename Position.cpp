@@ -21,7 +21,7 @@ Piece Position::charToPiece(char fenChar) {
         case 'q': return BLACK_QUEEN;
         case 'k': return BLACK_KING;
     }
-    return EMPTY;
+    return NOPIECE;
 }
 
 void Position::parsePiecePlacement(const char* FEN, int& i){
@@ -118,11 +118,7 @@ Piece Position::getPieceAt(int square) {
     if (bitboards[BLACK_ROOK] & setBit(0ULL, square)) return BLACK_ROOK;
     if (bitboards[BLACK_QUEEN] & setBit(0ULL, square)) return BLACK_QUEEN;
 
-    return EMPTY;
-}
-
-U64 Position::getBitboard(Piece piece) {
-    return bitboards[piece];
+    return NOPIECE;
 }
 
 Color Position::getCurrentPlayer() {
@@ -158,11 +154,27 @@ U8 Position::getFullmoveCounter() {
 }
 
 U64 Position::getBlackOccupiedSquares() {
-    return getBitboard(BLACK_PAWN) | getBitboard(BLACK_KNIGHT) | getBitboard(BLACK_BISHOP) | getBitboard(BLACK_ROOK) | getBitboard(BLACK_QUEEN) | getBitboard(BLACK_KING);
+    return bitboards[BLACK_PAWN] | bitboards[BLACK_KNIGHT] | bitboards[BLACK_BISHOP] | bitboards[BLACK_ROOK] | bitboards[BLACK_QUEEN] | bitboards[BLACK_KING];
 }
 
 U64 Position::getWhiteOccupiedSquares() {
-    return getBitboard(WHITE_PAWN) | getBitboard(WHITE_KNIGHT) | getBitboard(WHITE_BISHOP) | getBitboard(WHITE_ROOK) | getBitboard(WHITE_QUEEN) | getBitboard(WHITE_KING);
+    return bitboards[WHITE_PAWN] | bitboards[WHITE_KNIGHT] | bitboards[WHITE_BISHOP] | bitboards[WHITE_ROOK] | bitboards[WHITE_QUEEN] | bitboards[WHITE_KING];
+}
+
+U64 Position::getFriendlyPieces() {
+    return currentPlayer == WHITE ? getWhiteOccupiedSquares() : getBlackOccupiedSquares();
+}
+
+U64 Position::getFriendlyPieces(PieceType pieceType) {
+    return bitboards[pieceType + 6 * currentPlayer];
+}
+
+U64 Position::getEnemyPieces() {
+    return currentPlayer == WHITE ? getBlackOccupiedSquares() : getWhiteOccupiedSquares();
+}
+
+U64 Position::getEnemyPieces(PieceType pieceType) {
+    return bitboards[pieceType + 6 * (1 - currentPlayer)];
 }
 
 U64 Position::getOccupiedSquares() {

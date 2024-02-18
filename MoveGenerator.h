@@ -11,7 +11,7 @@ class MoveGenerator {
         int generateMoves(Position &position);
 
     private:
-        void addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, Piece promotion);
+        void addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, PieceType promotion);
         // PAWN MOVES
         // Pawn pushes
         // https://www.chessprogramming.org/Pawn_Pushes_(Bitboards)

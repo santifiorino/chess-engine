@@ -5,7 +5,7 @@ typedef unsigned char U8;
 typedef unsigned long long U64;
 
 enum Piece {
-    EMPTY = -1,
+    NOPIECE = -1,
     WHITE_PAWN,
     WHITE_KNIGHT,
     WHITE_BISHOP,
@@ -18,6 +18,16 @@ enum Piece {
     BLACK_ROOK,
     BLACK_QUEEN,
     BLACK_KING
+};
+
+enum PieceType {
+    NOTYPE = -1,
+    PAWN,
+    KNIGHT,
+    BISHOP,
+    ROOK,
+    QUEEN,
+    KING
 };
 
 enum Color {
@@ -40,7 +50,7 @@ struct Move {
     U8 to;
     MoveType type;
     Piece captured;
-    Piece promotion;
+    PieceType promotion;
 };
 
 enum AlgebraicNotation {

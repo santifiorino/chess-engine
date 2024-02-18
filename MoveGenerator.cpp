@@ -31,7 +31,7 @@ int MoveGenerator::generateMoves(Position &position) {
     return i;
 }
 
-void MoveGenerator::addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, Piece promotion) {
+void MoveGenerator::addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, PieceType promotion) {
     Move move = {from, to, type, captured, promotion};
     legalMoves[i] = move;
     i++;
@@ -54,29 +54,23 @@ void MoveGenerator::generatePawnPush(U64 pawns, int& i, Color color, bool isDoub
         if (from == 0) break;
         U8 to = from + (isDoublePush ? 16 : 8) * (color == WHITE ? 1 : -1);
         if (color == WHITE && to >= 56 || color == BLACK && to < 8) {
-            addMove(i, from, to, PROMOTION, EMPTY, color == WHITE ? WHITE_QUEEN : BLACK_QUEEN);
-            addMove(i, from, to, PROMOTION, EMPTY, color == WHITE ? WHITE_ROOK : BLACK_ROOK);
-            addMove(i, from, to, PROMOTION, EMPTY, color == WHITE ? WHITE_BISHOP : BLACK_BISHOP);
-            addMove(i, from, to, PROMOTION, EMPTY, color == WHITE ? WHITE_KNIGHT : BLACK_KNIGHT);
+            addMove(i, from, to, PROMOTION, NOPIECE, QUEEN);
+            addMove(i, from, to, PROMOTION, NOPIECE, ROOK);
+            addMove(i, from, to, PROMOTION, NOPIECE, BISHOP);
+            addMove(i, from, to, PROMOTION, NOPIECE, KNIGHT);
         } else {
-            addMove(i, from, to, NORMAL, EMPTY, EMPTY);
+            addMove(i, from, to, NORMAL, NOPIECE, NOTYPE);
         }
         pawns &= pawns - 1;
     }
 }
 
 void MoveGenerator::generatePawnPushes(Position& position, int& i){
-    if (position.getCurrentPlayer() == WHITE) {
-        U64 whitePawns = position.getBitboard(WHITE_PAWN);
-        U64 empty = position.getEmptySquares();
-        generatePawnPush(pawnsAbleToPush(whitePawns, empty, WHITE), i, WHITE, false);
-        generatePawnPush(pawnsAbleToDoublePush(whitePawns, empty, WHITE), i, WHITE, true);
-    } else {
-        U64 blackPawns = position.getBitboard(BLACK_PAWN);
-        U64 empty = position.getEmptySquares();
-        generatePawnPush(pawnsAbleToPush(blackPawns, empty, BLACK), i, BLACK, false);
-        generatePawnPush(pawnsAbleToDoublePush(blackPawns, empty, BLACK), i, BLACK, true);
-    }
+    Color color = position.getCurrentPlayer();
+    U64 pawns = position.getFriendlyPieces(PAWN);
+    U64 empty = position.getEmptySquares();
+    generatePawnPush(pawnsAbleToPush(pawns, empty, color), i, color, false);
+    generatePawnPush(pawnsAbleToDoublePush(pawns, empty, color), i, color, true);
 }
 
 void MoveGenerator::precalculatePawnAttacks() {
@@ -89,10 +83,8 @@ void MoveGenerator::precalculatePawnAttacks() {
 
 void MoveGenerator::generatePawnCaptures(Position& position, int& i) {
     Color color = position.getCurrentPlayer();
-    U64 pawns = color == WHITE ? position.getBitboard(WHITE_PAWN) :
-                                 position.getBitboard(BLACK_PAWN);
-    U64 enemyPieces = color == WHITE ? position.getBlackOccupiedSquares() :
-                                       position.getWhiteOccupiedSquares();
+    U64 pawns = position.getFriendlyPieces(PAWN);
+    U64 enemyPieces = position.getEnemyPieces();
     if (position.getEnPassantTarget() != 64) enemyPieces |= 1ULL << position.getEnPassantTarget();
     while (pawns) {
         U8 from = bitScanForward(pawns);
@@ -100,15 +92,15 @@ void MoveGenerator::generatePawnCaptures(Position& position, int& i) {
         while (attacks) {
             U8 to = bitScanForward(attacks);
             if (to == position.getEnPassantTarget()) {
-                addMove(i, from, to, EN_PASSANT, color == WHITE ? BLACK_PAWN : WHITE_PAWN, EMPTY);
+                addMove(i, from, to, EN_PASSANT, color == WHITE ? BLACK_PAWN : WHITE_PAWN, NOTYPE);
             } else {
                 if (color == WHITE && to >= 56 || color == BLACK && to < 8) {
-                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), color == WHITE ? WHITE_QUEEN : BLACK_QUEEN);
-                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), color == WHITE ? WHITE_ROOK : BLACK_ROOK);
-                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), color == WHITE ? WHITE_BISHOP : BLACK_BISHOP);
-                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), color == WHITE ? WHITE_KNIGHT : BLACK_KNIGHT);
+                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), QUEEN);
+                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), ROOK);
+                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), BISHOP);
+                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), KNIGHT);
                 } else {
-                    addMove(i, from, to, CAPTURE, position.getPieceAt(to), EMPTY);
+                    addMove(i, from, to, CAPTURE, position.getPieceAt(to), NOTYPE);
                 }
             }
             attacks &= attacks - 1;
@@ -131,16 +123,14 @@ void MoveGenerator::precalculateKnightMoves() {
 }
 
 void MoveGenerator::generateKnightMoves(Position& position, int& i) {
-    Color color = position.getCurrentPlayer();
-    U64 knights = color == WHITE ? position.getBitboard(WHITE_KNIGHT) : position.getBitboard(BLACK_KNIGHT);
-    U64 friendlyPieces = color == WHITE ? position.getWhiteOccupiedSquares() :
-                                          position.getBlackOccupiedSquares();
+    U64 knights = position.getFriendlyPieces(KNIGHT);
+    U64 friendlyPieces = position.getFriendlyPieces();
     while (knights) {
         U8 from = bitScanForward(knights);
         U64 moves = arrKnightMoves[from] & ~friendlyPieces;
         while (moves) {
             U8 to = bitScanForward(moves);
-            addMove(i, from, to, position.getPieceAt(to) == EMPTY ? NORMAL : CAPTURE, position.getPieceAt(to), EMPTY);
+            addMove(i, from, to, position.getPieceAt(to) == NOPIECE ? NORMAL : CAPTURE, position.getPieceAt(to), NOTYPE);
             moves &= moves - 1;
         }
         knights &= knights - 1;
@@ -158,15 +148,13 @@ void MoveGenerator::precalculateKingMoves() {
 }
 
 void MoveGenerator::generateKingMoves(Position& position, int& i) {
-    Color color = position.getCurrentPlayer();
-    U64 king = color == WHITE ? position.getBitboard(WHITE_KING) : position.getBitboard(BLACK_KING);
-    U64 friendlyPieces = color == WHITE ? position.getWhiteOccupiedSquares() :
-                                          position.getBlackOccupiedSquares();
+    U64 king = position.getFriendlyPieces(KING);
+    U64 friendlyPieces = position.getFriendlyPieces();
     U8 from = bitScanForward(king);
     U64 moves = arrKingMoves[from] & ~friendlyPieces;
     while (moves) {
         U8 to = bitScanForward(moves);
-        addMove(i, from, to, position.getPieceAt(to) == EMPTY ? NORMAL : CAPTURE, position.getPieceAt(to), EMPTY);
+        addMove(i, from, to, position.getPieceAt(to) == NOPIECE ? NORMAL : CAPTURE, position.getPieceAt(to), NOTYPE);
         moves &= moves - 1;
     }
 }
@@ -337,17 +325,8 @@ void MoveGenerator::precalculateSliderMoves(bool isBishop) {
 }
 
 void MoveGenerator::generateSliderMoves(Position& position, int& i, bool isBishop) {
-    Color color = position.getCurrentPlayer();
-    U64 pieces;
-    if (isBishop) {
-        pieces = color == WHITE ? position.getBitboard(WHITE_BISHOP) :
-                                  position.getBitboard(BLACK_BISHOP);
-    } else {
-        pieces = color == WHITE ? position.getBitboard(WHITE_ROOK) :
-                                  position.getBitboard(BLACK_ROOK);
-    }
-    U64 friendlyPieces = color == WHITE ? position.getWhiteOccupiedSquares() :
-                                          position.getBlackOccupiedSquares();
+    U64 pieces = isBishop ? position.getFriendlyPieces(BISHOP) : position.getFriendlyPieces(ROOK);
+    U64 friendlyPieces = position.getFriendlyPieces();
     while (pieces) {
         U8 from = bitScanForward(pieces);
         U64 occupancy = position.getOccupiedSquares();
@@ -363,7 +342,7 @@ void MoveGenerator::generateSliderMoves(Position& position, int& i, bool isBisho
         }
         while (moves) {
             U8 to = bitScanForward(moves);
-            addMove(i, from, to, position.getPieceAt(to) == EMPTY ? NORMAL : CAPTURE, position.getPieceAt(to), EMPTY);
+            addMove(i, from, to, position.getPieceAt(to) == NOPIECE ? NORMAL : CAPTURE, position.getPieceAt(to), NOTYPE);
             moves &= moves - 1;
         }
         pieces &= pieces - 1;
