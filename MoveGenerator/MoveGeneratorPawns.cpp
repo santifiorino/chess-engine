@@ -51,7 +51,7 @@ void MoveGenerator::generatePawnCaptures(Position& position, int& i) {
     Color color = position.getCurrentPlayer();
     U64 pawns = position.getFriendlyPieces(PAWN);
     U64 enemyPieces = position.getEnemyPieces();
-    if (position.getEnPassantTarget() != 64) enemyPieces |= 1ULL << position.getEnPassantTarget();
+    if (position.getEnPassantTarget() != NOSQUARE) enemyPieces |= 1ULL << position.getEnPassantTarget();
     while (pawns) {
         U8 from = bitScanForward(pawns);
         U64 attacks = arrPawnAttacks[color][from] & enemyPieces;

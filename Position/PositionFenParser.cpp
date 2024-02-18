@@ -3,6 +3,17 @@
 
 #include "Position.h"
 
+void Position::parseFen(const char* FEN) {
+    int i = 0;
+    initializeBoards();
+    parsePiecePlacement(FEN, i);
+    parsePlayer(FEN, i);
+    parseCastlingAbility(FEN, i);
+    parseEnPassantTarget(FEN, i);
+    parseHalfmoveClock(FEN, i);
+    parseFullmoveCounter(FEN, i);
+}
+
 void Position::parsePiecePlacement(const char* FEN, int& i){
     int file = 7;
     int rank = 0;
@@ -68,7 +79,7 @@ void Position::parseCastlingAbility(const char* FEN, int& i){
 }
 
 void Position::parseEnPassantTarget(const char* FEN, int& i){
-    enPassantTargetSquare = 64;
+    enPassantTargetSquare = NOSQUARE;
     if (FEN[i] == '-') {
         i += 2;
     } else {

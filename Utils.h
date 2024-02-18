@@ -5,7 +5,6 @@ typedef unsigned char U8;
 typedef unsigned long long U64;
 
 enum Piece {
-    NOPIECE = -1,
     WHITE_PAWN,
     WHITE_KNIGHT,
     WHITE_BISHOP,
@@ -17,17 +16,18 @@ enum Piece {
     BLACK_BISHOP,
     BLACK_ROOK,
     BLACK_QUEEN,
-    BLACK_KING
+    BLACK_KING,
+    NOPIECE
 };
 
 enum PieceType {
-    NOTYPE = -1,
     PAWN,
     KNIGHT,
     BISHOP,
     ROOK,
     QUEEN,
-    KING
+    KING,
+    NOTYPE
 };
 
 enum Color {
@@ -62,7 +62,8 @@ enum AlgebraicNotation {
     A5, B5, C5, D5, E5, F5, G5, H5,
     A6, B6, C6, D6, E6, F6, G6, H6,
     A7, B7, C7, D7, E7, F7, G7, H7,
-    A8, B8, C8, D8, E8, F8, G8, H8
+    A8, B8, C8, D8, E8, F8, G8, H8,
+    NOSQUARE
 };
 
 const U64 RANK_1 = 0xFF;
@@ -125,6 +126,8 @@ inline bool isDigit(char c) {
 inline int toDigit(char c) {
     return c - '0';
 }
+
+const char STARTING_POSITION_FEN[] = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
 /**
  * bitScanForward

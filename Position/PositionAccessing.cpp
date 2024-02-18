@@ -16,6 +16,7 @@ Piece Position::getPieceAt(int square) {
     if (bitboards[BLACK_BISHOP] & setBit(0ULL, square)) return BLACK_BISHOP;
     if (bitboards[BLACK_ROOK] & setBit(0ULL, square)) return BLACK_ROOK;
     if (bitboards[BLACK_QUEEN] & setBit(0ULL, square)) return BLACK_QUEEN;
+    if (bitboards[BLACK_KING] & setBit(0ULL, square)) return BLACK_KING;
 
     return NOPIECE;
 }

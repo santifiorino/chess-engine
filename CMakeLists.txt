@@ -18,10 +18,11 @@ enable_testing()
 
 add_executable(
   PositionTests
-  Position/PositionTests.cpp
   Position/Position.cpp
-  Position/PositionFenParser.cpp
   Position/PositionAccessing.cpp
+  Position/PositionFenParser.cpp
+  Position/PositionMove.cpp
+  Position/PositionTests.cpp
   Utils.cpp
 )
 
@@ -32,16 +33,17 @@ target_link_libraries(
 
 add_executable(
   MoveGeneratorTests
-  MoveGenerator/MoveGeneratorTests.cpp
   MoveGenerator/MoveGenerator.cpp
-  MoveGenerator/MoveGeneratorPawns.cpp
+  MoveGenerator/MoveGeneratorKing.cpp
   MoveGenerator/MoveGeneratorKnights.cpp
   MoveGenerator/MoveGeneratorMagic.cpp
+  MoveGenerator/MoveGeneratorPawns.cpp
   MoveGenerator/MoveGeneratorSliders.cpp
-  MoveGenerator/MoveGeneratorKing.cpp
+  MoveGenerator/MoveGeneratorTests.cpp
   Position/Position.cpp
-  Position/PositionFenParser.cpp
   Position/PositionAccessing.cpp
+  Position/PositionFenParser.cpp
+  Position/PositionMove.cpp
   Utils.cpp
 )
 

@@ -5,7 +5,9 @@
 
 class Position {
 public:
-    Position(char* FEN);
+    Position();
+    void parseFen(const char* Fen);
+    void makeMove(Move move);
 
     // Position accessing
     Piece getPieceAt(int square);
@@ -49,6 +51,7 @@ private:
     void parseHalfmoveClock(const char* FEN, int& i);
     void parseFullmoveCounter(const char* FEN, int& i);
     
+    void removeCastlingAbility(Color color, MoveType type);
 };
 
 #endif

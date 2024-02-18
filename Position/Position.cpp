@@ -3,15 +3,12 @@
 
 #include "Position.h"
 
-Position::Position(char* FEN) {
+Position::Position() {
     initializeBoards();
-    int i = 0;
-    parsePiecePlacement(FEN, i);
-    parsePlayer(FEN, i);
-    parseCastlingAbility(FEN, i);
-    parseEnPassantTarget(FEN, i);
-    parseHalfmoveClock(FEN, i);
-    parseFullmoveCounter(FEN, i);
+    castlingAbility = 0;
+    enPassantTargetSquare = NOSQUARE;
+    halfmoveClock = 0;
+    fullmoveCounter = 0;
 }
 
 void Position::initializeBoards() {

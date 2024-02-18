@@ -3,11 +3,18 @@
 
 class MoveGeneratorTest : public ::testing::Test {
 protected:
-    Position startingPosition = Position("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
-    Position e4BlackToMovePosition = Position("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
-    Position arbitraryWhiteToMovePosition = Position("r1bqk2r/ppp4p/n2p1ppn/2bPp3/1PB1P3/2P2N1P/P4PP1/RNBQ1RK1 w kq - 0 10");
-    Position arbitraryBlackToMovePosition = Position("2kr3r/pppq1p2/2n1bn1p/3pp1p1/B3P3/1P1P1N1P/P1PB1PP1/R2Q1RK1 b - - 0 13");
+    Position startingPosition = Position();
+    Position e4BlackToMovePosition = Position();
+    Position arbitraryWhiteToMovePosition = Position();
+    Position arbitraryBlackToMovePosition = Position();
     MoveGenerator moveGenerator = MoveGenerator();
+
+    void SetUp() override {
+        startingPosition.parseFen("rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1");
+        e4BlackToMovePosition.parseFen("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1");
+        arbitraryWhiteToMovePosition.parseFen("r1bqk2r/ppp4p/n2p1ppn/2bPp3/1PB1P3/2P2N1P/P4PP1/RNBQ1RK1 w kq - 0 10");
+        arbitraryBlackToMovePosition.parseFen("2kr3r/pppq1p2/2n1bn1p/3pp1p1/B3P3/1P1P1N1P/P1PB1PP1/R2Q1RK1 b - - 0 13");
+    }
 
     void assertEqualMove(Move move, U8 from, U8 to, MoveType type, Piece captured, PieceType promotion) {
         EXPECT_EQ(move.from, from);
@@ -195,32 +202,37 @@ TEST_F(MoveGeneratorTest, arbitraryBlackToMoveQueenMoves) {
 }
 
 TEST_F(MoveGeneratorTest, whiteEnPassantLeftToRight) {
-    Position whiteEnPassantLeftToRightPosition = Position("r1b1kb1r/2qn3p/p1n5/1pppPppP/3p4/NBP2N2/PP3PP1/R1BQ1RK1 w kq f6 0 15");
+    Position whiteEnPassantLeftToRightPosition = Position();
+    whiteEnPassantLeftToRightPosition.parseFen("r1b1kb1r/2qn3p/p1n5/1pppPppP/3p4/NBP2N2/PP3PP1/R1BQ1RK1 w kq f6 0 15");
     EXPECT_EQ(moveGenerator.generateMoves(whiteEnPassantLeftToRightPosition), 35);
     assertEqualMove(moveGenerator.legalMoves[6], E5, F6, EN_PASSANT, BLACK_PAWN, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, whiteEnPassantRighToLeft) {
-    Position whiteEnPassantRightToLeftPosition = Position("r1b1kb1r/2qn1p1p/p1np4/1pp3pP/3pP3/N1P2N2/PPB2PP1/R1BQ1RK1 w kq g6 0 13");
+    Position whiteEnPassantRightToLeftPosition = Position();
+    whiteEnPassantRightToLeftPosition.parseFen("r1b1kb1r/2qn1p1p/p1np4/1pp3pP/3pP3/N1P2N2/PPB2PP1/R1BQ1RK1 w kq g6 0 13");
     EXPECT_EQ(moveGenerator.generateMoves(whiteEnPassantRightToLeftPosition), 36);
     assertEqualMove(moveGenerator.legalMoves[8], H5, G6, EN_PASSANT, BLACK_PAWN, NOTYPE);
 }
 
 
 TEST_F(MoveGeneratorTest, blackEnPassantLeftToRight) {
-    Position blackEnPassantLeftToRightPosition = Position("r1b1kb1r/pp3ppp/1qnp1n2/1B2p3/2pPP3/N1P2N1P/PP3PP1/R1BQ1RK1 b kq d3 0 8");
+    Position blackEnPassantLeftToRightPosition = Position();
+    blackEnPassantLeftToRightPosition.parseFen("r1b1kb1r/pp3ppp/1qnp1n2/1B2p3/2pPP3/N1P2N1P/PP3PP1/R1BQ1RK1 b kq d3 0 8");
     EXPECT_EQ(moveGenerator.generateMoves(blackEnPassantLeftToRightPosition), 39);
     assertEqualMove(moveGenerator.legalMoves[7], C4, D3, EN_PASSANT, WHITE_PAWN, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, blackEnPassantRightToLeft) {
-    Position blackEnPassantRightToLeftPosition = Position("r1b1kb1r/pp3ppp/1qnp1n2/1B2p3/1Pp1P3/N1P2N1P/P2P1PP1/R1BQ1RK1 b kq b3 0 8");
+    Position blackEnPassantRightToLeftPosition = Position();
+    blackEnPassantRightToLeftPosition.parseFen("r1b1kb1r/pp3ppp/1qnp1n2/1B2p3/1Pp1P3/N1P2N1P/P2P1PP1/R1BQ1RK1 b kq b3 0 8");
     EXPECT_EQ(moveGenerator.generateMoves(blackEnPassantRightToLeftPosition), 40);
     assertEqualMove(moveGenerator.legalMoves[7], C4, B3, EN_PASSANT, WHITE_PAWN, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, whitePawnPromotion) {
-    Position whitePromotePosition = Position("r7/1kn2P2/1q6/8/2p5/4B3/6K1/5R2 w - - 0 1");
+    Position whitePromotePosition = Position();
+    whitePromotePosition.parseFen("r7/1kn2P2/1q6/8/2p5/4B3/6K1/5R2 w - - 0 1");
     EXPECT_EQ(moveGenerator.generateMoves(whitePromotePosition), 33);
     assertEqualMove(moveGenerator.legalMoves[0], F7, F8, PROMOTION, NOPIECE, QUEEN);
     assertEqualMove(moveGenerator.legalMoves[1], F7, F8, PROMOTION, NOPIECE, ROOK);
@@ -229,7 +241,8 @@ TEST_F(MoveGeneratorTest, whitePawnPromotion) {
 }
 
 TEST_F(MoveGeneratorTest, whitePawnCapturePromotion) {
-    Position whiteCapturePromotePosition = Position("r3r1b1/1kn2P2/nq6/5Q2/2p5/4B3/6K1/5R2 w - - 0 1");
+    Position whiteCapturePromotePosition = Position();
+    whiteCapturePromotePosition.parseFen("r3r1b1/1kn2P2/nq6/5Q2/2p5/4B3/6K1/5R2 w - - 0 1");
     EXPECT_EQ(moveGenerator.generateMoves(whiteCapturePromotePosition), 61);
     assertEqualMove(moveGenerator.legalMoves[0], F7, F8, PROMOTION, NOPIECE, QUEEN);
     assertEqualMove(moveGenerator.legalMoves[1], F7, F8, PROMOTION, NOPIECE, ROOK);
@@ -248,7 +261,8 @@ TEST_F(MoveGeneratorTest, whitePawnCapturePromotion) {
 };
 
 TEST_F(MoveGeneratorTest, blackPawnPromotion) {
-    Position blackToPromotePosition = Position("8/1k6/8/8/8/8/1p4K1/8 b - - 0 1");
+    Position blackToPromotePosition = Position();
+    blackToPromotePosition.parseFen("8/1k6/8/8/8/8/1p4K1/8 b - - 0 1");
     EXPECT_EQ(moveGenerator.generateMoves(blackToPromotePosition), 12);
     assertEqualMove(moveGenerator.legalMoves[0], B2, B1, PROMOTION, NOPIECE, QUEEN);
     assertEqualMove(moveGenerator.legalMoves[1], B2, B1, PROMOTION, NOPIECE, ROOK);
@@ -257,7 +271,8 @@ TEST_F(MoveGeneratorTest, blackPawnPromotion) {
 }
 
 TEST_F(MoveGeneratorTest, blackPawnCapturePromotion) {
-    Position blackToCapturePromotePosition = Position("8/1k6/8/8/8/8/1p4K1/R1B5 b - - 0 1");
+    Position blackToCapturePromotePosition = Position();
+    blackToCapturePromotePosition.parseFen("8/1k6/8/8/8/8/1p4K1/R1B5 b - - 0 1");
     EXPECT_EQ(moveGenerator.generateMoves(blackToCapturePromotePosition), 20);
     assertEqualMove(moveGenerator.legalMoves[0], B2, B1, PROMOTION, NOPIECE, QUEEN);
     assertEqualMove(moveGenerator.legalMoves[1], B2, B1, PROMOTION, NOPIECE, ROOK);
@@ -276,7 +291,8 @@ TEST_F(MoveGeneratorTest, blackPawnCapturePromotion) {
 }
 
 TEST_F(MoveGeneratorTest, whiteKingMovesAndCaptures) {
-    Position whiteKingCapturePosition = Position("8/1n6/1k6/8/4bp2/5K2/4NP2/8 w - - 0 1");
+    Position whiteKingCapturePosition = Position();
+    whiteKingCapturePosition.parseFen("8/1n6/1k6/8/4bp2/5K2/4NP2/8 w - - 0 1");
     EXPECT_EQ(moveGenerator.generateMoves(whiteKingCapturePosition), 12);
     assertEqualMove(moveGenerator.legalMoves[6], F3, G2, NORMAL, NOPIECE, NOTYPE);
     assertEqualMove(moveGenerator.legalMoves[7], F3, E3, NORMAL, NOPIECE, NOTYPE);
@@ -287,7 +303,8 @@ TEST_F(MoveGeneratorTest, whiteKingMovesAndCaptures) {
 }
 
 TEST_F(MoveGeneratorTest, blackKingMovesAndCaptures) {
-    Position blackKingCapturePosition = Position("4r3/4kp2/3PnB2/8/2Q5/1K6/8/8 b - - 0 1");
+    Position blackKingCapturePosition = Position();
+    blackKingCapturePosition.parseFen("4r3/4kp2/3PnB2/8/2Q5/1K6/8/8 b - - 0 1");
     EXPECT_EQ(moveGenerator.generateMoves(blackKingCapturePosition), 20);
     assertEqualMove(moveGenerator.legalMoves[8], E7, D6, CAPTURE, WHITE_PAWN, NOTYPE);
     assertEqualMove(moveGenerator.legalMoves[9], E7, F6, CAPTURE, WHITE_BISHOP, NOTYPE);
@@ -297,44 +314,51 @@ TEST_F(MoveGeneratorTest, blackKingMovesAndCaptures) {
 }
 
 TEST_F(MoveGeneratorTest, whiteKingSideCastle) {
-    Position whiteKingSideCastle = Position("r1bqk1nr/pppp2pp/n4p2/2bPp3/2B1P3/2P2N2/PP3PPP/RNBQK2R w KQkq - 3 7");
+    Position whiteKingSideCastle = Position();
+    whiteKingSideCastle.parseFen("r1bqk1nr/pppp2pp/n4p2/2bPp3/2B1P3/2P2N2/PP3PPP/RNBQK2R w KQkq - 3 7");
     EXPECT_EQ(moveGenerator.generateMoves(whiteKingSideCastle), 41);
     assertEqualMove(moveGenerator.legalMoves[40], E1, G1, KINGSIDE_CASTLE, NOPIECE, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, whiteQueenSideCastle) {
-    Position whiteQueenSideCastle = Position("rnbk1b1Q/ppppqp1p/5np1/8/4P3/2NPB3/PPP2PPP/R3KBNR w KQ - 5 8");
+    Position whiteQueenSideCastle = Position();
+    whiteQueenSideCastle.parseFen("rnbk1b1Q/ppppqp1p/5np1/8/4P3/2NPB3/PPP2PPP/R3KBNR w KQ - 5 8");
     EXPECT_EQ(moveGenerator.generateMoves(whiteQueenSideCastle), 43);
     assertEqualMove(moveGenerator.legalMoves[42], E1, C1, QUEENSIDE_CASTLE, NOPIECE, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, whiteCastleBothWays) {
-    Position whiteCastleBothWays = Position("2bqkb1r/rpp2ppp/p1np4/4p2n/3PP3/2NBBN2/PPP1QPPP/R3K2R w KQk - 4 8");
+    Position whiteCastleBothWays = Position();
+    whiteCastleBothWays.parseFen("2bqkb1r/rpp2ppp/p1np4/4p2n/3PP3/2NBBN2/PPP1QPPP/R3K2R w KQk - 4 8");
     EXPECT_EQ(moveGenerator.generateMoves(whiteCastleBothWays), 41);
     assertEqualMove(moveGenerator.legalMoves[39], E1, G1, KINGSIDE_CASTLE, NOPIECE, NOTYPE);
     assertEqualMove(moveGenerator.legalMoves[40], E1, C1, QUEENSIDE_CASTLE, NOPIECE, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, whiteKingSideCastleUnderAttack) {
-    Position whiteCantCastle = Position("rnbqk2r/pppp1p1p/1b3np1/4p3/4P2N/3B1P2/PPPP2PP/RNBQK2R w KQkq - 1 6");
+    Position whiteCantCastle = Position();
+    whiteCantCastle.parseFen("rnbqk2r/pppp1p1p/1b3np1/4p3/4P2N/3B1P2/PPPP2PP/RNBQK2R w KQkq - 1 6");
      EXPECT_EQ(moveGenerator.generateMoves(whiteCantCastle), 25);
 
 }
 
 TEST_F(MoveGeneratorTest, blackKingSideCastle) {
-    Position blackKingSideCastle = Position("rnbqk2r/pppp1ppp/3b1n2/4p3/2B5/4PQ2/PPPPNPPP/RNB1K2R b KQkq - 5 4");
+    Position blackKingSideCastle = Position();
+    blackKingSideCastle.parseFen("rnbqk2r/pppp1ppp/3b1n2/4p3/2B5/4PQ2/PPPPNPPP/RNB1K2R b KQkq - 5 4");
     EXPECT_EQ(moveGenerator.generateMoves(blackKingSideCastle), 29);
     assertEqualMove(moveGenerator.legalMoves[28], E8, G8, KINGSIDE_CASTLE, NOPIECE, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, blackQueenSideCastle) {
-    Position blackQueenSideCastle = Position("r3k1r1/p1ppqppp/bpnb1n2/4p3/2B5/2NPP1Q1/PPP2PPP/RNBK2R1 b q - 3 9");
+    Position blackQueenSideCastle = Position();
+    blackQueenSideCastle.parseFen("r3k1r1/p1ppqppp/bpnb1n2/4p3/2B5/2NPP1Q1/PPP2PPP/RNBK2R1 b q - 3 9");
     EXPECT_EQ(moveGenerator.generateMoves(blackQueenSideCastle), 33);
     assertEqualMove(moveGenerator.legalMoves[32], E8, C8, QUEENSIDE_CASTLE, NOPIECE, NOTYPE);
 }
 
 TEST_F(MoveGeneratorTest, blackCastleBothWays) {
-    Position blackCastleBothWays = Position("r3k2r/ppp1pp1p/2q1bnpb/3p4/3P4/1PP1P1PP/P3BP2/RNB1K1NR b KQkq - 0 9");
+    Position blackCastleBothWays = Position();
+    blackCastleBothWays.parseFen("r3k2r/ppp1pp1p/2q1bnpb/3p4/3P4/1PP1P1PP/P3BP2/RNB1K1NR b KQkq - 0 9");
     EXPECT_EQ(moveGenerator.generateMoves(blackCastleBothWays), 39);
     // 5+5+10+5+9+3+2
     assertEqualMove(moveGenerator.legalMoves[37], E8, G8, KINGSIDE_CASTLE, NOPIECE, NOTYPE);
@@ -342,6 +366,7 @@ TEST_F(MoveGeneratorTest, blackCastleBothWays) {
 }
 
 TEST_F(MoveGeneratorTest, blackQueenSideCastleUnderAttack) {
-    Position blackCantCastle = Position("r3k1r1/p1pp1ppp/Bpnbqn2/4p3/8/2NPP1Q1/PPP2PPP/RNBK2R1 b q - 0 10");
+    Position blackCantCastle = Position();
+    blackCantCastle.parseFen("r3k1r1/p1pp1ppp/Bpnbqn2/4p3/8/2NPP1Q1/PPP2PPP/RNBK2R1 b q - 0 10");
     EXPECT_EQ(moveGenerator.generateMoves(blackCantCastle), 37);
 }
