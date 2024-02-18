@@ -9,6 +9,7 @@ class MoveGenerator {
         MoveGenerator();
         Move legalMoves[218];
         int generateMoves(Position &position);
+        bool isSquareAttacked(Position &position, U8 square, Color color);
 
     private:
         void addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, PieceType promotion);
@@ -31,7 +32,7 @@ class MoveGenerator {
         void precalculateKnightMoves();
         void generateKnightMoves(Position &position, int &i);
 
-        // KING MOVES, TODO: CASTLING
+        // KING MOVES
         // https://www.chessprogramming.org/King_Pattern
         U64 arrKingMoves[64];
         void precalculateKingMoves();
@@ -101,7 +102,13 @@ class MoveGenerator {
         U64 arrBishopMoves[64][512];
         U64 arrRookMoves[64][4096];
         void precalculateSliderMoves(PieceType pieceType);
+        U64 getBishopMoves(U8 square, U64 occupancy);
+        U64 getRookMoves(U8 square, U64 occupancy);
+        U64 getQueenMoves(U8 square, U64 occupancy);
         void generateSliderMoves(Position &position, int &i, PieceType pieceType);
+
+        // CASTLING
+        void generateCastlingMoves(Position &position, int &i);
 };
 
 #endif

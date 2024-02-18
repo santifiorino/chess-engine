@@ -295,3 +295,53 @@ TEST_F(MoveGeneratorTest, blackKingMovesAndCaptures) {
     assertEqualMove(moveGenerator.legalMoves[11], E7, D8, NORMAL, NOPIECE, NOTYPE);
     assertEqualMove(moveGenerator.legalMoves[12], E7, F8, NORMAL, NOPIECE, NOTYPE);
 }
+
+TEST_F(MoveGeneratorTest, whiteKingSideCastle) {
+    Position whiteKingSideCastle = Position("r1bqk1nr/pppp2pp/n4p2/2bPp3/2B1P3/2P2N2/PP3PPP/RNBQK2R w KQkq - 3 7");
+    EXPECT_EQ(moveGenerator.generateMoves(whiteKingSideCastle), 41);
+    assertEqualMove(moveGenerator.legalMoves[40], E1, G1, CASTLE_KINGSIDE, NOPIECE, NOTYPE);
+}
+
+TEST_F(MoveGeneratorTest, whiteQueenSideCastle) {
+    Position whiteQueenSideCastle = Position("rnbk1b1Q/ppppqp1p/5np1/8/4P3/2NPB3/PPP2PPP/R3KBNR w KQ - 5 8");
+    EXPECT_EQ(moveGenerator.generateMoves(whiteQueenSideCastle), 43);
+    assertEqualMove(moveGenerator.legalMoves[42], E1, C1, CASTLE_QUEENSIDE, NOPIECE, NOTYPE);
+}
+
+TEST_F(MoveGeneratorTest, whiteCastleBothWays) {
+    Position whiteCastleBothWays = Position("2bqkb1r/rpp2ppp/p1np4/4p2n/3PP3/2NBBN2/PPP1QPPP/R3K2R w KQk - 4 8");
+    EXPECT_EQ(moveGenerator.generateMoves(whiteCastleBothWays), 41);
+    assertEqualMove(moveGenerator.legalMoves[39], E1, G1, CASTLE_KINGSIDE, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[40], E1, C1, CASTLE_QUEENSIDE, NOPIECE, NOTYPE);
+}
+
+TEST_F(MoveGeneratorTest, whiteKingSideCastleUnderAttack) {
+    Position whiteCantCastle = Position("rnbqk2r/pppp1p1p/1b3np1/4p3/4P2N/3B1P2/PPPP2PP/RNBQK2R w KQkq - 1 6");
+     EXPECT_EQ(moveGenerator.generateMoves(whiteCantCastle), 25);
+
+}
+
+TEST_F(MoveGeneratorTest, blackKingSideCastle) {
+    Position blackKingSideCastle = Position("rnbqk2r/pppp1ppp/3b1n2/4p3/2B5/4PQ2/PPPPNPPP/RNB1K2R b KQkq - 5 4");
+    EXPECT_EQ(moveGenerator.generateMoves(blackKingSideCastle), 29);
+    assertEqualMove(moveGenerator.legalMoves[28], E8, G8, CASTLE_KINGSIDE, NOPIECE, NOTYPE);
+}
+
+TEST_F(MoveGeneratorTest, blackQueenSideCastle) {
+    Position blackQueenSideCastle = Position("r3k1r1/p1ppqppp/bpnb1n2/4p3/2B5/2NPP1Q1/PPP2PPP/RNBK2R1 b q - 3 9");
+    EXPECT_EQ(moveGenerator.generateMoves(blackQueenSideCastle), 33);
+    assertEqualMove(moveGenerator.legalMoves[32], E8, C8, CASTLE_QUEENSIDE, NOPIECE, NOTYPE);
+}
+
+TEST_F(MoveGeneratorTest, blackCastleBothWays) {
+    Position blackCastleBothWays = Position("r3k2r/ppp1pp1p/2q1bnpb/3p4/3P4/1PP1P1PP/P3BP2/RNB1K1NR b KQkq - 0 9");
+    EXPECT_EQ(moveGenerator.generateMoves(blackCastleBothWays), 39);
+    // 5+5+10+5+9+3+2
+    assertEqualMove(moveGenerator.legalMoves[37], E8, G8, CASTLE_KINGSIDE, NOPIECE, NOTYPE);
+    assertEqualMove(moveGenerator.legalMoves[38], E8, C8, CASTLE_QUEENSIDE, NOPIECE, NOTYPE);
+}
+
+TEST_F(MoveGeneratorTest, blackQueenSideCastleUnderAttack) {
+    Position blackCantCastle = Position("r3k1r1/p1pp1ppp/Bpnbqn2/4p3/8/2NPP1Q1/PPP2PPP/RNBK2R1 b q - 0 10");
+    EXPECT_EQ(moveGenerator.generateMoves(blackCantCastle), 37);
+}

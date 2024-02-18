@@ -19,12 +19,16 @@ public:
     U8 getFullmoveCounter();
 
     // Bitboard
+    U64 getOccupiedSquares(Piece piece);
+    U64 getOccupiedSquares(Color color);
+    U64 getOccupiedSquares();
+    U64 getEmptySquares();
+
     U64 getFriendlyPieces();
     U64 getFriendlyPieces(PieceType pieceType);
     U64 getEnemyPieces();
     U64 getEnemyPieces(PieceType pieceType);
-    U64 getOccupiedSquares();
-    U64 getEmptySquares();
+    
     
 private:
     // Bitboard representation
@@ -44,10 +48,7 @@ private:
     void parseEnPassantTarget(const char* FEN, int& i);
     void parseHalfmoveClock(const char* FEN, int& i);
     void parseFullmoveCounter(const char* FEN, int& i);
-
-    // Utils
-    U64 getBlackOccupiedSquares();
-    U64 getWhiteOccupiedSquares();
+    
 };
 
 #endif

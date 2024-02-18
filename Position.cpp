@@ -153,16 +153,40 @@ U8 Position::getFullmoveCounter() {
     return fullmoveCounter;
 }
 
-U64 Position::getBlackOccupiedSquares() {
-    return bitboards[BLACK_PAWN] | bitboards[BLACK_KNIGHT] | bitboards[BLACK_BISHOP] | bitboards[BLACK_ROOK] | bitboards[BLACK_QUEEN] | bitboards[BLACK_KING];
+U64 Position::getOccupiedSquares(Piece piece) {
+    return bitboards[piece];
 }
 
-U64 Position::getWhiteOccupiedSquares() {
-    return bitboards[WHITE_PAWN] | bitboards[WHITE_KNIGHT] | bitboards[WHITE_BISHOP] | bitboards[WHITE_ROOK] | bitboards[WHITE_QUEEN] | bitboards[WHITE_KING];
+U64 Position::getOccupiedSquares(Color color) {
+    if (color == WHITE) {
+        return  getOccupiedSquares(WHITE_PAWN)   |
+                getOccupiedSquares(WHITE_KNIGHT) |
+                getOccupiedSquares(WHITE_BISHOP) |
+                getOccupiedSquares(WHITE_ROOK)   |
+                getOccupiedSquares(WHITE_QUEEN)  |
+                getOccupiedSquares(WHITE_KING);
+    } else {
+        return  getOccupiedSquares(BLACK_PAWN)   |
+                getOccupiedSquares(BLACK_KNIGHT) |
+                getOccupiedSquares(BLACK_BISHOP) |
+                getOccupiedSquares(BLACK_ROOK)   |
+                getOccupiedSquares(BLACK_QUEEN)  |
+                getOccupiedSquares(BLACK_KING);
+    
+    }
 }
+
+U64 Position::getOccupiedSquares() {
+    return getOccupiedSquares(WHITE) | getOccupiedSquares(BLACK);
+}
+
+U64 Position::getEmptySquares() {
+    return ~getOccupiedSquares();
+}
+
 
 U64 Position::getFriendlyPieces() {
-    return currentPlayer == WHITE ? getWhiteOccupiedSquares() : getBlackOccupiedSquares();
+    return currentPlayer == WHITE ? getOccupiedSquares(WHITE) : getOccupiedSquares(BLACK);
 }
 
 U64 Position::getFriendlyPieces(PieceType pieceType) {
@@ -170,17 +194,9 @@ U64 Position::getFriendlyPieces(PieceType pieceType) {
 }
 
 U64 Position::getEnemyPieces() {
-    return currentPlayer == WHITE ? getBlackOccupiedSquares() : getWhiteOccupiedSquares();
+    return currentPlayer == WHITE ? getOccupiedSquares(BLACK) : getOccupiedSquares(WHITE);
 }
 
 U64 Position::getEnemyPieces(PieceType pieceType) {
     return bitboards[pieceType + 6 * (1 - currentPlayer)];
-}
-
-U64 Position::getOccupiedSquares() {
-    return getBlackOccupiedSquares() | getWhiteOccupiedSquares();
-}
-
-U64 Position::getEmptySquares() {
-    return ~getOccupiedSquares();
 }

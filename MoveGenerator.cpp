@@ -29,6 +29,8 @@ int MoveGenerator::generateMoves(Position &position) {
     generateSliderMoves(position, i, BISHOP);
     generateSliderMoves(position, i, ROOK);
     generateSliderMoves(position, i, QUEEN);
+    // Castling
+    generateCastlingMoves(position, i);
     return i;
 }
 
@@ -325,31 +327,108 @@ void MoveGenerator::precalculateSliderMoves(PieceType pieceType) {
     }
 }
 
+U64 MoveGenerator::getBishopMoves(U8 square, U64 occupancy) {
+    occupancy &= arrBishopOccupancyMask[square];
+    occupancy *= arrBishopMagicNumbers[square];
+    occupancy >>= 64 - arrBishopRelevantBits[square];
+    return arrBishopMoves[square][(int) occupancy];
+}
+
+U64 MoveGenerator::getRookMoves(U8 square, U64 occupancy) {
+    occupancy &= arrRookOccupancyMask[square];
+    occupancy *= arrRookMagicNumbers[square];
+    occupancy >>= 64 - arrRookRelevantBits[square];
+    return arrRookMoves[square][(int) occupancy];
+}
+
+U64 MoveGenerator::getQueenMoves(U8 square, U64 occupancy) {
+    return getBishopMoves(square, occupancy) | getRookMoves(square, occupancy);
+}
+
 void MoveGenerator::generateSliderMoves(Position& position, int& i, PieceType pieceType) {
     U64 friendlyPieces = position.getFriendlyPieces();
     U64 pieces = position.getFriendlyPieces(pieceType);
+    U64 occupancy = position.getOccupiedSquares();
     while (pieces) {
         U8 from = bitScanForward(pieces);
-        U64 occupancy;
-        int magicIndex;
-        U64 moves = 0ULL;
-        if (pieceType == BISHOP || pieceType == QUEEN) {
-            occupancy = position.getOccupiedSquares();
-            occupancy &= arrBishopOccupancyMask[from];
-            magicIndex = (int) ((occupancy * arrBishopMagicNumbers[from]) >> (64 - arrBishopRelevantBits[from]));
-            moves = arrBishopMoves[from][magicIndex] & ~friendlyPieces;
-        }
-        if (pieceType == ROOK || pieceType == QUEEN) {
-            occupancy = position.getOccupiedSquares();
-            occupancy &= arrRookOccupancyMask[from];
-            magicIndex = (int) ((occupancy * arrRookMagicNumbers[from]) >> (64 - arrRookRelevantBits[from]));
-            moves |= arrRookMoves[from][magicIndex] & ~friendlyPieces;
-        }
+        U64 moves;
+        if (pieceType == BISHOP) moves = getBishopMoves(from, occupancy);
+        if (pieceType == ROOK) moves = getRookMoves(from, occupancy);
+        if (pieceType == QUEEN) moves = getQueenMoves(from, occupancy);
+        moves &= ~friendlyPieces;
         while (moves) {
             U8 to = bitScanForward(moves);
             addMove(i, from, to, position.getPieceAt(to) == NOPIECE ? NORMAL : CAPTURE, position.getPieceAt(to), NOTYPE);
             moves &= moves - 1;
         }
         pieces &= pieces - 1;
+    }
+}
+
+bool MoveGenerator::isSquareAttacked(Position& position, U8 square, Color color) {
+    U64 occupancy = position.getOccupiedSquares();
+    if (color == WHITE) {
+        // If a black pawn is there, and it can attack a white pawn, then it's attacked by that pawn
+        // If a black knight is there, and it can attack a white knight, then it's attacked by that knight
+        // etc.
+        if (arrPawnAttacks[BLACK][square] & position.getOccupiedSquares(WHITE_PAWN)) return true;
+        if (arrKnightMoves[square] & position.getOccupiedSquares(WHITE_KNIGHT)) return true;
+        if (getBishopMoves(square, occupancy) & position.getOccupiedSquares(WHITE_BISHOP)) return true;
+        if (getRookMoves(square, occupancy) & position.getOccupiedSquares(WHITE_ROOK)) return true;
+        if (getQueenMoves(square, occupancy) & position.getOccupiedSquares(WHITE_QUEEN)) return true;
+        if (arrKingMoves[square] & position.getOccupiedSquares(WHITE_KING)) return true;
+        return false;
+    } else {
+        if (arrPawnAttacks[WHITE][square] & position.getOccupiedSquares(BLACK_PAWN)) return true;
+        if (arrKnightMoves[square] & position.getOccupiedSquares(BLACK_KNIGHT)) return true;
+        if (getBishopMoves(square, occupancy) & position.getOccupiedSquares(BLACK_BISHOP)) return true;
+        if (getRookMoves(square, occupancy) & position.getOccupiedSquares(BLACK_ROOK)) return true;
+        if (getQueenMoves(square, occupancy) & position.getOccupiedSquares(BLACK_QUEEN)) return true;
+        if (arrKingMoves[square] & position.getOccupiedSquares(BLACK_KING)) return true;
+        return false;
+    }
+}
+
+void MoveGenerator::generateCastlingMoves(Position& position, int& i) {
+    if (position.getCurrentPlayer() == WHITE) {
+        if (position.whiteCanCastleKingside()) {
+            if (!isSquareAttacked(position, E1, BLACK) &&
+                !isSquareAttacked(position, F1, BLACK) &&
+                !isSquareAttacked(position, G1, BLACK) &&
+                position.getPieceAt(F1) == NOPIECE &&
+                position.getPieceAt(G1) == NOPIECE) {
+                addMove(i, E1, G1, CASTLE_KINGSIDE, NOPIECE, NOTYPE);
+            }
+        }
+        if (position.whiteCanCastleQueenside()) {
+            if (!isSquareAttacked(position, C1, BLACK) &&
+                !isSquareAttacked(position, D1, BLACK) &&
+                !isSquareAttacked(position, E1, BLACK) &&
+                position.getPieceAt(B1) == NOPIECE &&
+                position.getPieceAt(C1) == NOPIECE &&
+                position.getPieceAt(D1) == NOPIECE) {
+                addMove(i, E1, C1, CASTLE_QUEENSIDE, NOPIECE, NOTYPE);
+            }
+        }
+    } else {
+        if (position.blackCanCastleKingside()) {
+            if (!isSquareAttacked(position, E8, WHITE) &&
+                !isSquareAttacked(position, F8, WHITE) &&
+                !isSquareAttacked(position, G8, WHITE) &&
+                position.getPieceAt(F8) == NOPIECE &&
+                position.getPieceAt(G8) == NOPIECE) {
+                addMove(i, E8, G8, CASTLE_KINGSIDE, NOPIECE, NOTYPE);
+            }
+        }
+        if (position.blackCanCastleQueenside()) {
+            if (!isSquareAttacked(position, C8, WHITE) &&
+                !isSquareAttacked(position, D8, WHITE) &&
+                !isSquareAttacked(position, E8, WHITE) &&
+                position.getPieceAt(B8) == NOPIECE &&
+                position.getPieceAt(C8) == NOPIECE &&
+                position.getPieceAt(D8) == NOPIECE) {
+                addMove(i, E8, C8, CASTLE_QUEENSIDE, NOPIECE, NOTYPE);
+            }
+        }
     }
 }
