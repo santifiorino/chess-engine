@@ -30,4 +30,4 @@ add_executable(
     )
 
 # Link the SDL2 libraries to the executable
-target_link_libraries(ChessEngine mingw32 SDL2main SDL2 SDL2_image LIBPNG16)
+target_link_libraries(ChessEngine mingw32 SDL2main SDL2 SDL2_image)

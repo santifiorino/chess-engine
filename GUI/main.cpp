@@ -47,47 +47,64 @@ int main(int argc, char* argv[]) {
 
     int mouseX, mouseY;
     int grabbedPieceSquare = -1;
-    U64 grabbedPieceTargets;
+    U64 grabbedPieceTargets = 0ULL;
+    U64 paintedSquares = 0ULL;
 
     SDL_Event event;
     bool running = true;
     while (running) {
         SDL_GetMouseState(&mouseX, &mouseY);
         while (SDL_PollEvent(&event)) {
+            int i = mouseX / 100;
+            int j = mouseY / 100;
+            int square = (7 - j) * 8 + i;
             if (event.type == SDL_QUIT) {
                 running = false;
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-                int i = mouseX / 100;
-                int j = mouseY / 100;
-                grabbedPieceSquare = (7 - j) * 8 + i;
-                grabbedPieceTargets = game.getMovesFrom(grabbedPieceSquare);
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    // Grab piece
+                    grabbedPieceSquare = square;
+                    grabbedPieceTargets = game.getMovesFrom(grabbedPieceSquare);
+                }
             } else if (event.type == SDL_MOUSEBUTTONUP) {
-                if (grabbedPieceSquare != -1) {
-                    int i = mouseX / 100;
-                    int j = mouseY / 100;
-                    int to = (7 - j) * 8 + i;
-                    int move = game.isLegalMove(grabbedPieceSquare, to);
-                    if (move != -1) {
-                        game.makeMove(move);
+                if (event.button.button == SDL_BUTTON_LEFT) {
+                    if (grabbedPieceSquare != -1) {
+                        // Make move if legal and drop piece
+                        int move = game.isLegalMove(grabbedPieceSquare, square);
+                        if (move != -1) {
+                            game.makeMove(move);
+                            paintedSquares = 0ULL;
+                        }
+                        grabbedPieceSquare = -1;
                     }
-                    grabbedPieceSquare = -1;
+                } else if (event.button.button == SDL_BUTTON_RIGHT) {
+                    // Paint square
+                    paintedSquares ^= setBit(0ULL, square);
                 }
             }
         }
+
+        // Display squares
         SDL_RenderClear(renderer);
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 boardRect.x = i * 100;
                 boardRect.y = j * 100;
+                int square = (7 - j) * 8 + i;
                 if ((i + j) % 2 == 0) {
                     SDL_SetRenderDrawColor(renderer, WHITE_SQUARE_COLOR[0], WHITE_SQUARE_COLOR[1], WHITE_SQUARE_COLOR[2], 255);
                 } else {
                     SDL_SetRenderDrawColor(renderer, BLACK_SQUARE_COLOR[0], BLACK_SQUARE_COLOR[1], BLACK_SQUARE_COLOR[2], 255);
                 }
                 SDL_RenderFillRect(renderer, &boardRect);
+                if (paintedSquares & setBit(0ULL, square)) {
+                    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
+                    SDL_RenderFillRect(renderer, &boardRect);
+                }
             }
         }
 
+        // Paint attacked squares by the grabbed piece
         if (grabbedPieceSquare != -1) {
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
@@ -102,6 +119,7 @@ int main(int argc, char* argv[]) {
             }
         }
     
+        // Display pieces
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 int square = (7 - j) * 8 + i;
@@ -116,6 +134,7 @@ int main(int argc, char* argv[]) {
             }
         }
 
+        // Display grabbed piece
         if (grabbedPieceSquare != -1) {
             int piece = game.getPieceAt(grabbedPieceSquare);
             pieceRect.x = mouseX - pieceWidth[piece] / 2;
@@ -124,13 +143,12 @@ int main(int argc, char* argv[]) {
             pieceRect.h = pieceHeight[piece];
             SDL_RenderCopy(renderer, pieceTexture[piece], NULL, &pieceRect);
         }
+
         SDL_RenderPresent(renderer);
     }
 
-
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
-
     SDL_Quit();
     return 0;
 }
