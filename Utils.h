@@ -1,5 +1,5 @@
-#ifndef CONSTANTS_H
-#define CONSTANTS_H
+#ifndef UTILS_H
+#define UTILS_H
 
 typedef unsigned char U8;
 typedef unsigned long long U64;
@@ -154,6 +154,9 @@ const int index64[64] = {
 int bitScanForward(U64 bb);
 
 int countOnes(U64 b);
+
+extern U64 arrBishopMoves[64][512];
+extern U64 arrRookMoves[64][4096];
 
 // Pseudorandom number generator
 class RandomNumberGenerator {

@@ -1,3 +1,6 @@
+#ifndef UTILS_CPP
+#define UTILS_CPP
+
 #include "Utils.h"
 
 U64 soutOne (U64 b) { return b >> 8; }
@@ -20,6 +23,9 @@ int countOnes(U64 b) {
    return r;
 }
 
+U64 arrBishopMoves[64][512];
+U64 arrRookMoves[64][4096];
+
 unsigned int RandomNumberGenerator::generateRandomU32() {
    seed ^= (seed << 13);
    seed ^= (seed >> 17);
@@ -39,3 +45,5 @@ U64 RandomNumberGenerator::generateRandomU64() {
 U64 RandomNumberGenerator::generateRandomU64FewBits() {
    return generateRandomU64() & generateRandomU64() & generateRandomU64();
 }
+
+#endif

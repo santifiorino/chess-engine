@@ -1,7 +1,6 @@
 #ifndef MOVEGENERATOR_H
 #define MOVEGENERATOR_H
 
-#include "../Utils.h"
 #include "../Position/Position.h"
 
 class MoveGenerator {
@@ -99,8 +98,6 @@ class MoveGenerator {
             4621959876687437889, 38421407337562113, 4616330425369894922, 9227911937680998657, 10520971817022656514, 9228438896277262370, 2305844177478877316, 282597190173698
         };
         // BISHOP, ROOK, QUEEN MOVES
-        U64 arrBishopMoves[64][512];
-        U64 arrRookMoves[64][4096];
         void precalculateSliderMoves(PieceType pieceType);
         U64 getBishopMoves(U8 square, U64 occupancy);
         U64 getRookMoves(U8 square, U64 occupancy);
