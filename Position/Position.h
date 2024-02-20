@@ -8,6 +8,7 @@ public:
     Position();
     void parseFen(const char* Fen);
     void makeMove(Move move);
+    void unmakeMove(Move move, U8 castlingRights, U8 prevEnPassantTargetSquare, U8 prevHalfmoveClock, U8 prevFullmoveCounter);
 
     // Position accessing
     Piece getPieceAt(int square);
@@ -16,6 +17,7 @@ public:
     bool whiteCanQueensideCastle();
     bool blackCanKingsideCastle();
     bool blackCanQueensideCastle();
+    U8 getCastlingAbility();
     U8 getEnPassantTarget();
     U8 getHalfmoveClock();
     U8 getFullmoveCounter();
@@ -50,7 +52,10 @@ private:
     void parseEnPassantTarget(const char* FEN, int& i);
     void parseHalfmoveClock(const char* FEN, int& i);
     void parseFullmoveCounter(const char* FEN, int& i);
-    
+
+    // Move making and unmaking
+    void toggleCapturedPiece(Move move);
+    void toggleCastleRooks(MoveType type, bool makeMove=true); 
     void removeCastlingAbility(Color color, MoveType type);
 };
 

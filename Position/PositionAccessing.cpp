@@ -89,6 +89,10 @@ bool Position::blackCanQueensideCastle() {
     return castlingAbility & 8;
 }
 
+U8 Position::getCastlingAbility() {
+    return castlingAbility;
+}
+
 U8 Position::getEnPassantTarget() {
     return enPassantTargetSquare;
 }
