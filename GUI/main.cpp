@@ -63,14 +63,18 @@ int main(int argc, char* argv[]) {
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     // Grab piece
-                    grabbedPieceSquare = square;
-                    grabbedPieceTargets = game.getMovesFrom(grabbedPieceSquare);
+                    if (game.getPieceAt(square) != NOPIECE) {
+                        grabbedPieceSquare = square;
+                        grabbedPieceTargets = game.getMovesFrom(grabbedPieceSquare);
+                    } else {
+                        grabbedPieceSquare = -1;
+                    }
                 }
             } else if (event.type == SDL_MOUSEBUTTONUP) {
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     if (grabbedPieceSquare != -1) {
                         // Make move if legal and drop piece
-                        int move = game.isLegalMove(grabbedPieceSquare, square);
+                        int move = game.moveIndex(grabbedPieceSquare, square);
                         if (move != -1) {
                             game.makeMove(move);
                             paintedSquares = 0ULL;

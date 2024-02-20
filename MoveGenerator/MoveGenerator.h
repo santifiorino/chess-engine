@@ -6,7 +6,7 @@
 class MoveGenerator {
     public:
         MoveGenerator();
-        Move legalMoves[218];
+        Move pseudoLegalMoves[218];
         int generateMoves(Position &position);
         bool isSquareAttackedByColor(Position &position, U8 square, Color color);
 

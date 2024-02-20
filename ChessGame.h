@@ -7,7 +7,7 @@ class ChessGame {
 public:
     ChessGame();
     Piece getPieceAt(int square);
-    int isLegalMove(int from, int to);
+    int moveIndex(U8 from, U8 to);
     void makeMove(int moveIndex, bool checkingLegality = false);
     void unmakeMove(int moveIndex);
     U64 getMovesFrom(int from);
@@ -15,7 +15,11 @@ public:
 private:
     Position position;
     MoveGenerator moveGenerator;
+    int legalMovesIndex[218];
     int movesCount;
+
+    int generateLegalMoves();
+    int checkMoveLegality(int index);
 
     int currMoveIndex;
     Move moveList[1024];

@@ -29,7 +29,7 @@ int MoveGenerator::generateMoves(Position &position) {
 
 void MoveGenerator::addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, PieceType promotion) {
     Move move = {from, to, type, captured, promotion};
-    legalMoves[i] = move;
+    pseudoLegalMoves[i] = move;
     i++;
 }
 
