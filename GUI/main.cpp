@@ -1,7 +1,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <iostream>
-#include "../ChessGame.h"
+
+#include "../ChessGame/ChessGame.h"
 
 const int WHITE_SQUARE_COLOR[3] = {237, 214, 167};
 const int BLACK_SQUARE_COLOR[3] = {184, 135, 98};
@@ -74,11 +74,8 @@ int main(int argc, char* argv[]) {
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     if (grabbedPieceSquare != -1) {
                         // Make move if legal and drop piece
-                        int move = game.moveIndex(grabbedPieceSquare, square);
-                        if (move != -1) {
-                            game.makeMove(move);
-                            paintedSquares = 0ULL;
-                        }
+                        bool moved = game.makeMove(grabbedPieceSquare, square);
+                        if (moved) paintedSquares = 0ULL;
                         grabbedPieceSquare = -1;
                     }
                 } else if (event.button.button == SDL_BUTTON_RIGHT) {

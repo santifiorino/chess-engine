@@ -11,10 +11,10 @@ include_directories(D:/msys64/mingw64/include)
 # Add the directory where SDL2 libraries are located
 link_directories(D:/msys64/mingw64/lib)
 
-# Add an executable target called "MyExecutable" to be built from the source file "main.cpp"
 add_executable(
     ChessEngine
     main.cpp
+    ../ChessGame/ChessGame.cpp
     ../MoveGenerator/MoveGenerator.cpp
     ../MoveGenerator/MoveGeneratorKing.cpp
     ../MoveGenerator/MoveGeneratorKnights.cpp
@@ -25,7 +25,6 @@ add_executable(
     ../Position/PositionAccessing.cpp
     ../Position/PositionFenParser.cpp
     ../Position/PositionMove.cpp
-    ../ChessGame.cpp
     ../Utils.cpp
     )
 

@@ -27,7 +27,7 @@ void Position::makeMove(Move move){
     // Update castling ability
     if ((movedPiece == WHITE_KING || movedPiece == BLACK_KING) && move.type == NORMAL) {
         // Remove both castling abilities
-        removeCastlingAbility(WHITE, NORMAL);
+        removeCastlingAbility(getCurrentPlayer(), NORMAL);
     } else if (movedPiece == WHITE_ROOK) {
         if (move.from == H1) {
             removeCastlingAbility(WHITE, KINGSIDE_CASTLE);

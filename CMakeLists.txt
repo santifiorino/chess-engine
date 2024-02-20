@@ -52,6 +52,29 @@ target_link_libraries(
   GTest::gtest_main
 )
 
+add_executable(
+  ChessGameTests
+  ChessGame/ChessGame.cpp
+  ChessGame/ChessGameTests.cpp
+  MoveGenerator/MoveGenerator.cpp
+  MoveGenerator/MoveGeneratorKing.cpp
+  MoveGenerator/MoveGeneratorKnights.cpp
+  MoveGenerator/MoveGeneratorMagic.cpp
+  MoveGenerator/MoveGeneratorPawns.cpp
+  MoveGenerator/MoveGeneratorSliders.cpp
+  Position/Position.cpp
+  Position/PositionAccessing.cpp
+  Position/PositionFenParser.cpp
+  Position/PositionMove.cpp
+  Utils.cpp
+)
+
+target_link_libraries(
+  ChessGameTests
+  GTest::gtest_main
+)
+
 include(GoogleTest)
 gtest_discover_tests(PositionTests)
 gtest_discover_tests(MoveGeneratorTests)
+gtest_discover_tests(ChessGameTests)

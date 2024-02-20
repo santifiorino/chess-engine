@@ -4,19 +4,20 @@
 #include "Position.h"
 
 Piece Position::getPieceAt(int square) {
-    if (bitboards[WHITE_PAWN] & setBit(0ULL, square)) return WHITE_PAWN;
-    if (bitboards[WHITE_KNIGHT] & setBit(0ULL, square)) return WHITE_KNIGHT;
-    if (bitboards[WHITE_BISHOP] & setBit(0ULL, square)) return WHITE_BISHOP;
-    if (bitboards[WHITE_ROOK] & setBit(0ULL, square)) return WHITE_ROOK;
-    if (bitboards[WHITE_QUEEN] & setBit(0ULL, square)) return WHITE_QUEEN;
-    if (bitboards[WHITE_KING] & setBit(0ULL, square)) return WHITE_KING;
+    U64 squareBit = setBit(0ULL, square);
+    if (bitboards[WHITE_PAWN] & squareBit) return WHITE_PAWN;
+    if (bitboards[WHITE_KNIGHT] & squareBit) return WHITE_KNIGHT;
+    if (bitboards[WHITE_BISHOP] & squareBit) return WHITE_BISHOP;
+    if (bitboards[WHITE_ROOK] & squareBit) return WHITE_ROOK;
+    if (bitboards[WHITE_QUEEN] & squareBit) return WHITE_QUEEN;
+    if (bitboards[WHITE_KING] & squareBit) return WHITE_KING;
 
-    if (bitboards[BLACK_PAWN] & setBit(0ULL, square)) return BLACK_PAWN;
-    if (bitboards[BLACK_KNIGHT] & setBit(0ULL, square)) return BLACK_KNIGHT;
-    if (bitboards[BLACK_BISHOP] & setBit(0ULL, square)) return BLACK_BISHOP;
-    if (bitboards[BLACK_ROOK] & setBit(0ULL, square)) return BLACK_ROOK;
-    if (bitboards[BLACK_QUEEN] & setBit(0ULL, square)) return BLACK_QUEEN;
-    if (bitboards[BLACK_KING] & setBit(0ULL, square)) return BLACK_KING;
+    if (bitboards[BLACK_PAWN] & squareBit) return BLACK_PAWN;
+    if (bitboards[BLACK_KNIGHT] & squareBit) return BLACK_KNIGHT;
+    if (bitboards[BLACK_BISHOP] & squareBit) return BLACK_BISHOP;
+    if (bitboards[BLACK_ROOK] & squareBit) return BLACK_ROOK;
+    if (bitboards[BLACK_QUEEN] & squareBit) return BLACK_QUEEN;
+    if (bitboards[BLACK_KING] & squareBit) return BLACK_KING;
 
     return NOPIECE;
 }
@@ -74,19 +75,19 @@ Color Position::getCurrentPlayer() {
 }
 
 bool Position::whiteCanKingsideCastle() {
-    return castlingAbility & 1;
+    return castlingAbility & 0b0001;
 }
 
 bool Position::whiteCanQueensideCastle() {
-    return castlingAbility & 2;
+    return castlingAbility & 0b0010;
 }
 
 bool Position::blackCanKingsideCastle() {
-    return castlingAbility & 4;
+    return castlingAbility & 0b0100;
 }
 
 bool Position::blackCanQueensideCastle() {
-    return castlingAbility & 8;
+    return castlingAbility & 0b1000;
 }
 
 U8 Position::getCastlingAbility() {

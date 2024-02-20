@@ -1,25 +1,25 @@
 #ifndef CHESS_GAME_H
 #define CHESS_GAME_H
 
-#include "MoveGenerator/MoveGenerator.h"
+#include "../MoveGenerator/MoveGenerator.h"
 
 class ChessGame {
 public:
     ChessGame();
     Piece getPieceAt(int square);
-    int moveIndex(U8 from, U8 to);
-    void makeMove(int moveIndex, bool checkingLegality = false);
-    void unmakeMove(int moveIndex);
+    bool makeMove(U8 from, U8 to, bool checkCheckmate=true);
+    void unmakeMove(U8 from, U8 to);
     U64 getMovesFrom(int from);
 
 private:
     Position position;
     MoveGenerator moveGenerator;
-    int legalMovesIndex[218];
+    bool legalMove[218];
     int movesCount;
 
     int generateLegalMoves();
-    int checkMoveLegality(int index);
+    bool isMoveLegal(U8 from, U8 to);
+    int getMoveIndex(U8 from, U8 to);
 
     int currMoveIndex;
     Move moveList[1024];

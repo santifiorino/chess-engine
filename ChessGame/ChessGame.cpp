@@ -5,11 +5,11 @@
 #include <iostream>
 
 ChessGame::ChessGame() {
+    currMoveIndex = 0;
     position = Position();
     position.parseFen(STARTING_POSITION_FEN);
     moveGenerator = MoveGenerator();
-    movesCount = generateLegalMoves();
-    currMoveIndex = 0;
+    generateLegalMoves();
 }
 
 int ChessGame::generateLegalMoves() {
@@ -18,41 +18,34 @@ int ChessGame::generateLegalMoves() {
     for (int i = 0; i < movesCount; i++) {
         U8 from = moveGenerator.pseudoLegalMoves[i].from;
         U8 to = moveGenerator.pseudoLegalMoves[i].to;
-        legalMovesIndex[i] = checkMoveLegality(i);
-        if (legalMovesIndex[i] != -1)
-            legalMovesCount++;
+        legalMove[i] = isMoveLegal(from, to);
+        if (legalMove[i]) legalMovesCount++;
     }
     return legalMovesCount;
-}
-
-int ChessGame::moveIndex(U8 from, U8 to) {
-    for (int i = 0; i < movesCount; i++) {
-        U8 fromGen = moveGenerator.pseudoLegalMoves[i].from;
-        U8 toGen = moveGenerator.pseudoLegalMoves[i].to;
-        if (fromGen == from && toGen == to) 
-            return legalMovesIndex[i];
-    }
-    return -1;
 }
 
 Piece ChessGame::getPieceAt(int square) {
     return position.getPieceAt(square);
 }
 
-int ChessGame::checkMoveLegality(int index) {
+bool ChessGame::isMoveLegal(U8 from, U8 to) {
     // If I make the move and my king is attacked, it's not a legal move
     Piece king = position.getCurrentPlayer() == WHITE ? WHITE_KING : BLACK_KING;
-    makeMove(index, true);
+    makeMove(from, to, false);
     U8 kingSquare = bitScanForward(position.getOccupiedSquares(king));
     if (moveGenerator.isSquareAttackedByColor(position, kingSquare, position.getCurrentPlayer())){
-        unmakeMove(index);
-        return -1;
+        unmakeMove(from, to);
+        return false;
     }
-    unmakeMove(index);
-    return index;
+    unmakeMove(from, to);
+    return true;
 }
 
-void ChessGame::makeMove(int moveIndex, bool checkingLegality) {
+bool ChessGame::makeMove(U8 from, U8 to, bool checkCheckmate) {
+    int moveIndex = getMoveIndex(from, to);
+    if (moveIndex == -1) return false;
+    if (checkCheckmate)
+        if (!legalMove[moveIndex]) return false;
     moveList[currMoveIndex] = moveGenerator.pseudoLegalMoves[moveIndex];
     castlingAbility[currMoveIndex] = position.getCastlingAbility();
     enPassantSquares[currMoveIndex] = position.getEnPassantTarget();
@@ -60,7 +53,7 @@ void ChessGame::makeMove(int moveIndex, bool checkingLegality) {
     fullmoveCounter[currMoveIndex] = position.getFullmoveCounter();
     position.makeMove(moveGenerator.pseudoLegalMoves[moveIndex]);
     currMoveIndex++;
-    if (!checkingLegality) {
+    if (checkCheckmate) {
         int legalMoves = generateLegalMoves();
         if (legalMoves == 0) {
             Color enemyPlayer = position.getCurrentPlayer() == WHITE ? BLACK : WHITE;
@@ -74,9 +67,11 @@ void ChessGame::makeMove(int moveIndex, bool checkingLegality) {
             exit(0);
         }
     }
+    return true;
 }
 
-void ChessGame::unmakeMove(int moveIndex) {
+void ChessGame::unmakeMove(U8 from, U8 to) {
+    int moveIndex = getMoveIndex(from, to);
     currMoveIndex--;
     position.unmakeMove(moveGenerator.pseudoLegalMoves[moveIndex],
                         castlingAbility[currMoveIndex],
@@ -89,11 +84,20 @@ U64 ChessGame::getMovesFrom(int square) {
     U64 to = 0ULL;
     for (int i = 0; i < movesCount; i++) {
         if (moveGenerator.pseudoLegalMoves[i].from == square) {
-            if (legalMovesIndex[i] != -1)
+            if (legalMove[i])
                 to |= setBit(0ULL, moveGenerator.pseudoLegalMoves[i].to);
         }
     }
     return to;
+}
+
+int ChessGame::getMoveIndex(U8 from, U8 to) {
+    for (int i = 0; i < movesCount; i++) {
+        if (moveGenerator.pseudoLegalMoves[i].from == from && moveGenerator.pseudoLegalMoves[i].to == to) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 #endif
