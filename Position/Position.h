@@ -54,7 +54,7 @@ private:
     void parseFullmoveCounter(const char* FEN, int& i);
 
     // Move making and unmaking
-    void toggleCapturedPiece(Move move);
+    void toggleCapturedPiece(Move move, bool makeMove=true);
     void toggleCastleRooks(MoveType type, bool makeMove=true); 
     void removeCastlingAbility(Color color, MoveType type);
 };

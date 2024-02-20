@@ -24,11 +24,8 @@ void Position::makeMove(Move move){
         bitboards[move.promotion + 6 * currentPlayer] |= toSquare;
     }
 
-    // Update current player
-    currentPlayer = (currentPlayer == WHITE) ? BLACK : WHITE;
-
     // Update castling ability
-    if (movedPiece == WHITE_KING || movedPiece == BLACK_KING) {
+    if ((movedPiece == WHITE_KING || movedPiece == BLACK_KING) && move.type == NORMAL) {
         // Remove both castling abilities
         removeCastlingAbility(WHITE, NORMAL);
     } else if (movedPiece == WHITE_ROOK) {
@@ -44,6 +41,9 @@ void Position::makeMove(Move move){
             removeCastlingAbility(BLACK, QUEENSIDE_CASTLE);
         }
     }
+
+    // Update current player
+    currentPlayer = (currentPlayer == WHITE) ? BLACK : WHITE;
 
     // Update en passant target square
     enPassantTargetSquare = NOSQUARE;
@@ -91,7 +91,7 @@ void Position::unmakeMove(Move move, U8 castlingRights, U8 prevEnPassantTargetSq
     U64 fromSquare = setBit(0ULL, move.from);
     U64 toSquare = setBit(0ULL, move.to);
 
-    toggleCapturedPiece(move);
+    toggleCapturedPiece(move, false);
     toggleCastleRooks(move.type, false);
 
     if (move.type != PROMOTION && move.type != PROMOTION_CAPTURE) {
@@ -123,13 +123,13 @@ void Position::unmakeMove(Move move, U8 castlingRights, U8 prevEnPassantTargetSq
 
 }
 
-void Position::toggleCapturedPiece(Move move) {
+void Position::toggleCapturedPiece(Move move, bool makeMove) {
     U64 toSquare = setBit(0ULL, move.to);
     if (move.type == CAPTURE || move.type == PROMOTION_CAPTURE) {
         Piece captured = move.captured;
         bitboards[captured] ^= toSquare;
     } else if (move.type == EN_PASSANT) {
-        U8 capturedPawnSquare = move.to + (currentPlayer == WHITE ? -8 : 8);
+        U8 capturedPawnSquare = move.to + (currentPlayer == WHITE ? -8 : 8) * (makeMove ? 1 : -1);
         Piece capturedPawn = move.captured;
         bitboards[capturedPawn] ^= setBit(0ULL, capturedPawnSquare);
     }

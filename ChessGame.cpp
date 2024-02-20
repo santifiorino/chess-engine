@@ -8,7 +8,7 @@ ChessGame::ChessGame() {
     position = Position();
     position.parseFen(STARTING_POSITION_FEN);
     moveGenerator = MoveGenerator();
-    generateLegalMoves();
+    movesCount = generateLegalMoves();
     currMoveIndex = 0;
 }
 
@@ -19,10 +19,8 @@ int ChessGame::generateLegalMoves() {
         U8 from = moveGenerator.pseudoLegalMoves[i].from;
         U8 to = moveGenerator.pseudoLegalMoves[i].to;
         legalMovesIndex[i] = checkMoveLegality(i);
-        if (legalMovesIndex[i] != -1){
+        if (legalMovesIndex[i] != -1)
             legalMovesCount++;
-            std::cout << "legal move from " << (int)from << " to " << (int)to << std::endl;
-        } 
     }
     return legalMovesCount;
 }
@@ -31,9 +29,8 @@ int ChessGame::moveIndex(U8 from, U8 to) {
     for (int i = 0; i < movesCount; i++) {
         U8 fromGen = moveGenerator.pseudoLegalMoves[i].from;
         U8 toGen = moveGenerator.pseudoLegalMoves[i].to;
-        if (fromGen == from && toGen == to) {
+        if (fromGen == from && toGen == to) 
             return legalMovesIndex[i];
-        }
     }
     return -1;
 }
@@ -64,9 +61,8 @@ void ChessGame::makeMove(int moveIndex, bool checkingLegality) {
     position.makeMove(moveGenerator.pseudoLegalMoves[moveIndex]);
     currMoveIndex++;
     if (!checkingLegality) {
-        movesCount = generateLegalMoves();
-        std::cout << "Moves count: " << movesCount << std::endl;
-        if (movesCount == 0) {
+        int legalMoves = generateLegalMoves();
+        if (legalMoves == 0) {
             Color enemyPlayer = position.getCurrentPlayer() == WHITE ? BLACK : WHITE;
             Piece king = enemyPlayer == WHITE ? BLACK_KING : WHITE_KING;
             U8 kingSquare = bitScanForward(position.getOccupiedSquares(king));
