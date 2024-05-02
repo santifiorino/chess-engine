@@ -19,5 +19,5 @@ play (so far human vs human)
 santi:~$ mkdir GUI/build & cd GUI/build
 santi:~$ cmake ..
 santi:~$ make
-santi:~$ ChessEngine.exe
+santi:~$ ./ChessEngine.exe
 ```

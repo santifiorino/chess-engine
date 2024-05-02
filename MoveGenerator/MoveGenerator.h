@@ -6,12 +6,19 @@
 class MoveGenerator {
     public:
         MoveGenerator();
+        int pseudoLegalMovesCount;
+        int legalMovesCount;
         Move pseudoLegalMoves[218];
-        int generateMoves(Position &position);
+        bool legalMove[218];
+        void generateLegalMoves(Position &position);
+        int getMoveIndex(Position &position, U8 from, U8 to);
+        U64 getMovesFrom(Position &position, U8 square);
         bool isSquareAttackedByColor(Position &position, U8 square, Color color);
 
     private:
+        void generatePseudoLegalMoves(Position &position);
         void addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, PieceType promotion);
+        bool checkMoveLegality(Position &position, Move move);
         // PAWN MOVES
         // Pawn pushes
         // https://www.chessprogramming.org/Pawn_Pushes_(Bitboards)

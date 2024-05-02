@@ -14,7 +14,20 @@ MoveGenerator::MoveGenerator() {
     precalculateSliderMoves(ROOK);
 }
 
-int MoveGenerator::generateMoves(Position &position) {
+void MoveGenerator::generateLegalMoves(Position &position) {
+    for (int i = 0; i < pseudoLegalMovesCount; i++) legalMove[i] = false;
+    generatePseudoLegalMoves(position);
+    legalMovesCount = 0;
+    for (int i = 0; i < pseudoLegalMovesCount; i++) {
+        Move move = pseudoLegalMoves[i];
+        if (checkMoveLegality(position, move)) {
+            legalMove[legalMovesCount] = true;
+            legalMovesCount++;
+        }
+    }
+}
+
+void MoveGenerator::generatePseudoLegalMoves(Position &position) {
     int i = 0;
     generatePawnPushes(position, i);
     generatePawnCaptures(position, i);
@@ -24,7 +37,23 @@ int MoveGenerator::generateMoves(Position &position) {
     generateSliderMoves(position, i, ROOK);
     generateSliderMoves(position, i, QUEEN);
     generateCastlingMoves(position, i);
-    return i;
+    pseudoLegalMovesCount = i;
+}
+
+bool MoveGenerator::checkMoveLegality(Position &position, Move move) {
+    // Save position data and make the move
+    Piece king = position.getCurrentPlayer() == WHITE ? WHITE_KING : BLACK_KING;
+    U8 castlingAbility = position.getCastlingAbility();
+    U8 enPassantSquares = position.getEnPassantTarget();
+    U8 halfmoveClock = position.getHalfmoveClock();
+    U8 fullmoveCounter = position.getFullmoveCounter();
+    position.makeMove(move);
+    // If the king is attacked, the move is illegal
+    U8 kingSquare = bitScanForward(position.getOccupiedSquares(king));
+    bool res = !(isSquareAttackedByColor(position, kingSquare, position.getCurrentPlayer()));
+    // Unmake the move restoring the position data
+    position.unmakeMove(move, castlingAbility, enPassantSquares, halfmoveClock, fullmoveCounter);
+    return res;
 }
 
 void MoveGenerator::addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, PieceType promotion) {
@@ -55,6 +84,26 @@ bool MoveGenerator::isSquareAttackedByColor(Position& position, U8 square, Color
         if (arrKingMoves[square] & position.getOccupiedSquares(BLACK_KING)) return true;
         return false;
     }
+}
+
+int MoveGenerator::getMoveIndex(Position &position, U8 from, U8 to) {
+    for (int i = 0; i < pseudoLegalMovesCount; i++) {
+        if (pseudoLegalMoves[i].from == from && pseudoLegalMoves[i].to == to) {
+            return legalMove[i] ? i : -1;
+        }
+    }
+    return -1;
+}
+
+U64 MoveGenerator::getMovesFrom(Position &position, U8 square) {
+    U64 to = 0ULL;
+    for (int i = 0; i < pseudoLegalMovesCount; i++) {
+        if (pseudoLegalMoves[i].from == square) {
+            if (legalMove[i])
+                to |= setBit(0ULL, pseudoLegalMoves[i].to);
+        }
+    }
+    return to;
 }
 
 #endif

@@ -41,7 +41,6 @@ U64 Position::getOccupiedSquares(Color color) {
                 getOccupiedSquares(BLACK_ROOK)   |
                 getOccupiedSquares(BLACK_QUEEN)  |
                 getOccupiedSquares(BLACK_KING);
-    
     }
 }
 

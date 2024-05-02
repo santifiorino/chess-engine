@@ -54,6 +54,7 @@ int main(int argc, char* argv[]) {
     bool running = true;
     while (running) {
         SDL_GetMouseState(&mouseX, &mouseY);
+        // Handle mouse events (player moves)
         while (SDL_PollEvent(&event)) {
             int i = mouseX / 100;
             int j = mouseY / 100;
@@ -61,6 +62,7 @@ int main(int argc, char* argv[]) {
             if (event.type == SDL_QUIT) {
                 running = false;
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+                if (game.getCurrentPlayer() == BLACK) continue;
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     // Grab piece
                     if (game.getPieceAt(square) != NOPIECE) {
@@ -71,6 +73,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
             } else if (event.type == SDL_MOUSEBUTTONUP) {
+                if (game.getCurrentPlayer() == BLACK) continue;
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     if (grabbedPieceSquare != -1) {
                         // Make move if legal and drop piece
@@ -83,6 +86,10 @@ int main(int argc, char* argv[]) {
                     paintedSquares ^= setBit(0ULL, square);
                 }
             }
+        }
+        // Handle AI moves
+        if (game.getCurrentPlayer() == BLACK) {
+            game.makeAIMove();
         }
 
         // Display squares
