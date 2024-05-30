@@ -52,7 +52,6 @@ U64 Position::getEmptySquares() {
     return ~getOccupiedSquares();
 }
 
-
 U64 Position::getFriendlyPieces() {
     return currentPlayer == WHITE ? getOccupiedSquares(WHITE) : getOccupiedSquares(BLACK);
 }
@@ -103,6 +102,10 @@ U8 Position::getHalfmoveClock() {
 
 U8 Position::getFullmoveCounter() {
     return fullmoveCounter;
+}
+
+bool Position::halfmoveClockIsFifty() {
+    return halfmoveClock >= 100;
 }
 
 #endif

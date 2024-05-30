@@ -21,7 +21,7 @@ void MoveGenerator::generateLegalMoves(Position &position) {
     for (int i = 0; i < pseudoLegalMovesCount; i++) {
         Move move = pseudoLegalMoves[i];
         if (checkMoveLegality(position, move)) {
-            legalMove[legalMovesCount] = true;
+            legalMove[i] = true;
             legalMovesCount++;
         }
     }
@@ -98,10 +98,8 @@ int MoveGenerator::getMoveIndex(Position &position, U8 from, U8 to) {
 U64 MoveGenerator::getMovesFrom(Position &position, U8 square) {
     U64 to = 0ULL;
     for (int i = 0; i < pseudoLegalMovesCount; i++) {
-        if (pseudoLegalMoves[i].from == square) {
-            if (legalMove[i])
-                to |= setBit(0ULL, pseudoLegalMoves[i].to);
-        }
+        if (pseudoLegalMoves[i].from == square && legalMove[i]) 
+            to |= setBit(0ULL, pseudoLegalMoves[i].to);
     }
     return to;
 }

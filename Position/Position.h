@@ -31,7 +31,8 @@ public:
     U64 getFriendlyPieces(PieceType pieceType);
     U64 getEnemyPieces();
     U64 getEnemyPieces(PieceType pieceType);
-    
+
+    bool halfmoveClockIsFifty();
     
 private:
     // Bitboard representation

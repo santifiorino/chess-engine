@@ -5,6 +5,7 @@
 #include <iostream>
 
 ChessGame::ChessGame() {
+    isGameOver = false;
     currMoveIndex = 0;
     position = Position();
     position.parseFen(STARTING_POSITION_FEN);
@@ -28,6 +29,12 @@ bool ChessGame::makeMove(U8 from, U8 to) {
     fullmoveCounter[currMoveIndex] = position.getFullmoveCounter();
     position.makeMove(move);
     currMoveIndex++;
+
+    if (position.halfmoveClockIsFifty()) {
+        std::cout << "Draw by fifty-move rule!" << std::endl;
+        isGameOver = true;
+    }
+
     // Check if the game is over
     moveGenerator.generateLegalMoves(position);
     if (moveGenerator.legalMovesCount == 0) {
@@ -39,7 +46,7 @@ bool ChessGame::makeMove(U8 from, U8 to) {
         } else {
             std::cout << "Stalemate!" << std::endl;
         }
-        exit(0);
+        isGameOver = true;
     }
     return true;
 }
@@ -68,7 +75,7 @@ Color ChessGame::getCurrentPlayer() {
 void ChessGame::makeAIMove() {
     moveGenerator.generateLegalMoves(position);
     // select a random move
-    int randomMoveIndex = generateRandomU64() % moveGenerator.legalMovesCount;
+    int randomMoveIndex = rand() % moveGenerator.legalMovesCount;
     for (int i = 0; i < moveGenerator.pseudoLegalMovesCount; i++) {
         if (moveGenerator.legalMove[i]) {
             randomMoveIndex--;

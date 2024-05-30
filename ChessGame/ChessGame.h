@@ -6,6 +6,7 @@
 class ChessGame {
 public:
     ChessGame();
+    bool isGameOver;
     Piece getPieceAt(int square);
     bool makeMove(U8 from, U8 to);
     bool unmakeMove(U8 from, U8 to);

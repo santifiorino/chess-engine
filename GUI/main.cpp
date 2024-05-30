@@ -27,8 +27,8 @@ int main(int argc, char* argv[]) {
     boardRect.h = 100;
     // Pieces
     SDL_Rect pieceRect;
-    SDL_Texture* pieceTexture[12];
-    int pieceWidth[12], pieceHeight[12];
+    SDL_Texture* pieceTexture[14];
+    int pieceWidth[14], pieceHeight[14];
     pieceTexture[0] = IMG_LoadTexture(renderer, "../pieces/white_pawn.png");
     pieceTexture[1] = IMG_LoadTexture(renderer, "../pieces/white_knight.png");
     pieceTexture[2] = IMG_LoadTexture(renderer, "../pieces/white_bishop.png");
@@ -41,7 +41,9 @@ int main(int argc, char* argv[]) {
     pieceTexture[9] = IMG_LoadTexture(renderer, "../pieces/black_rook.png");
     pieceTexture[10] = IMG_LoadTexture(renderer, "../pieces/black_queen.png");
     pieceTexture[11] = IMG_LoadTexture(renderer, "../pieces/black_king.png");
-    for (int i = 0; i < 12; i++) {
+    pieceTexture[12] = IMG_LoadTexture(renderer, "../pieces/checkmate_won.png");
+    pieceTexture[13] = IMG_LoadTexture(renderer, "../pieces/checkmate_lost.png");
+    for (int i = 0; i < 14; i++) {
         SDL_QueryTexture(pieceTexture[i], NULL, NULL, &pieceWidth[i], &pieceHeight[i]);
     }
 
@@ -62,7 +64,6 @@ int main(int argc, char* argv[]) {
             if (event.type == SDL_QUIT) {
                 running = false;
             } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-                if (game.getCurrentPlayer() == BLACK) continue;
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     // Grab piece
                     if (game.getPieceAt(square) != NOPIECE) {
@@ -73,7 +74,7 @@ int main(int argc, char* argv[]) {
                     }
                 }
             } else if (event.type == SDL_MOUSEBUTTONUP) {
-                if (game.getCurrentPlayer() == BLACK) continue;
+
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     if (grabbedPieceSquare != -1) {
                         // Make move if legal and drop piece
@@ -88,10 +89,9 @@ int main(int argc, char* argv[]) {
             }
         }
         // Handle AI moves
-        if (game.getCurrentPlayer() == BLACK) {
+        if (game.getCurrentPlayer() == BLACK && !game.isGameOver)
             game.makeAIMove();
-        }
-
+        
         // Display squares
         SDL_RenderClear(renderer);
         for (int i = 0; i < 8; i++) {
@@ -151,6 +151,25 @@ int main(int argc, char* argv[]) {
             pieceRect.h = pieceHeight[piece];
             SDL_RenderCopy(renderer, pieceTexture[piece], NULL, &pieceRect);
         }
+
+        // Display game over
+        if (game.isGameOver) {
+            int winner = game.getCurrentPlayer() == WHITE ? BLACK_KING : WHITE_KING;
+            int loser = game.getCurrentPlayer() == WHITE ? WHITE_KING : BLACK_KING;
+            for (int i = 0; i < 8; i++) {
+                for (int j = 0; j < 8; j++) {
+                    int piece = game.getPieceAt((7 - j) * 8 + i);
+                    if (piece == winner || piece == loser) {
+                        int texture = piece == winner ? 12 : 13;
+                        pieceRect.x = i * 100 + 60;
+                        pieceRect.y = j * 100 + 10;
+                        pieceRect.w = pieceWidth[texture];
+                        pieceRect.h = pieceHeight[texture];
+                        SDL_RenderCopy(renderer, pieceTexture[texture], NULL, &pieceRect);
+                    }
+                }
+            }
+        } 
 
         SDL_RenderPresent(renderer);
     }

@@ -8,7 +8,7 @@ Position::Position() {
     castlingAbility = 0;
     enPassantTargetSquare = NOSQUARE;
     halfmoveClock = 0;
-    fullmoveCounter = 0;
+    fullmoveCounter = 1;
 }
 
 void Position::initializeBoards() {
