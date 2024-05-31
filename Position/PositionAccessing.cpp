@@ -108,4 +108,8 @@ bool Position::halfmoveClockIsFifty() {
     return halfmoveClock >= 100;
 }
 
+U64 Position::getPositionHash() {
+    return positionHash;
+}
+
 #endif

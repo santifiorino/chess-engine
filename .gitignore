@@ -1,4 +1,3 @@
 .vscode
 build
-helper.py
 GUI/build/*

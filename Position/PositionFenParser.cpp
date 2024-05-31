@@ -12,6 +12,7 @@ void Position::parseFen(const char* FEN) {
     parseEnPassantTarget(FEN, i);
     parseHalfmoveClock(FEN, i);
     parseFullmoveCounter(FEN, i);
+    initPositionHash();
 }
 
 void Position::parsePiecePlacement(const char* FEN, int& i){

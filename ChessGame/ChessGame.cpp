@@ -5,7 +5,7 @@
 #include <iostream>
 
 ChessGame::ChessGame() {
-    isGameOver = false;
+    winner = -1;
     currMoveIndex = 0;
     position = Position();
     position.parseFen(STARTING_POSITION_FEN);
@@ -28,6 +28,17 @@ bool ChessGame::makeMove(U8 from, U8 to) {
     halfmoveClock[currMoveIndex] = position.getHalfmoveClock();
     fullmoveCounter[currMoveIndex] = position.getFullmoveCounter();
     position.makeMove(move);
+
+    if (positionToRepetitionsMap.find(position.getPositionHash()) == positionToRepetitionsMap.end()) {
+        positionToRepetitionsMap[position.getPositionHash()] = 1;
+    } else {
+        positionToRepetitionsMap[position.getPositionHash()]++;
+    }
+    if (positionToRepetitionsMap[position.getPositionHash()] >= 3) {
+        std::cout << "Draw by threefold repetition!" << std::endl;
+        isGameOver = true;
+    }
+
     currMoveIndex++;
 
     if (position.halfmoveClockIsFifty()) {
@@ -43,11 +54,13 @@ bool ChessGame::makeMove(U8 from, U8 to) {
         U8 kingSquare = bitScanForward(position.getOccupiedSquares(king));
         if (moveGenerator.isSquareAttackedByColor(position, kingSquare, enemyPlayer)) {
             std::cout << "Checkmate!" << std::endl;
+            winner = enemyPlayer;
         } else {
             std::cout << "Stalemate!" << std::endl;
         }
         isGameOver = true;
     }
+
     return true;
 }
 
@@ -61,6 +74,7 @@ bool ChessGame::unmakeMove(U8 from, U8 to) {
                         enPassantSquares[currMoveIndex],
                         halfmoveClock[currMoveIndex],
                         fullmoveCounter[currMoveIndex]);
+    positionToRepetitionsMap[position.getPositionHash()]--;
     return true;
 }
 
@@ -85,6 +99,14 @@ void ChessGame::makeAIMove() {
             }
         }
     }
+}
+
+Move ChessGame::getLastMove() {
+    if (currMoveIndex == 0) {
+        Move move = {NOSQUARE, NOSQUARE, NORMAL, NOPIECE, NOTYPE};
+        return move;
+    }
+    return moveList[currMoveIndex - 1];
 }
 
 #endif

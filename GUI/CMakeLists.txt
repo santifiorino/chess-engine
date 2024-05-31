@@ -24,6 +24,7 @@ add_executable(
     ../Position/Position.cpp
     ../Position/PositionAccessing.cpp
     ../Position/PositionFenParser.cpp
+    ../Position/PositionHashing.cpp
     ../Position/PositionMove.cpp
     ../Utils.cpp
     )

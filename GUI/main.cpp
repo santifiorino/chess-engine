@@ -27,8 +27,8 @@ int main(int argc, char* argv[]) {
     boardRect.h = 100;
     // Pieces
     SDL_Rect pieceRect;
-    SDL_Texture* pieceTexture[14];
-    int pieceWidth[14], pieceHeight[14];
+    SDL_Texture* pieceTexture[16];
+    int pieceWidth[16], pieceHeight[16];
     pieceTexture[0] = IMG_LoadTexture(renderer, "../pieces/white_pawn.png");
     pieceTexture[1] = IMG_LoadTexture(renderer, "../pieces/white_knight.png");
     pieceTexture[2] = IMG_LoadTexture(renderer, "../pieces/white_bishop.png");
@@ -43,7 +43,9 @@ int main(int argc, char* argv[]) {
     pieceTexture[11] = IMG_LoadTexture(renderer, "../pieces/black_king.png");
     pieceTexture[12] = IMG_LoadTexture(renderer, "../pieces/checkmate_won.png");
     pieceTexture[13] = IMG_LoadTexture(renderer, "../pieces/checkmate_lost.png");
-    for (int i = 0; i < 14; i++) {
+    pieceTexture[14] = IMG_LoadTexture(renderer, "../pieces/tie_white.png");
+    pieceTexture[15] = IMG_LoadTexture(renderer, "../pieces/tie_black.png");
+    for (int i = 0; i < 16; i++) {
         SDL_QueryTexture(pieceTexture[i], NULL, NULL, &pieceWidth[i], &pieceHeight[i]);
     }
 
@@ -51,9 +53,11 @@ int main(int argc, char* argv[]) {
     int grabbedPieceSquare = -1;
     U64 grabbedPieceTargets = 0ULL;
     U64 paintedSquares = 0ULL;
+    Move lastMove;
 
     SDL_Event event;
     bool running = true;
+    
     while (running) {
         SDL_GetMouseState(&mouseX, &mouseY);
         // Handle mouse events (player moves)
@@ -74,7 +78,6 @@ int main(int argc, char* argv[]) {
                     }
                 }
             } else if (event.type == SDL_MOUSEBUTTONUP) {
-
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     if (grabbedPieceSquare != -1) {
                         // Make move if legal and drop piece
@@ -89,11 +92,14 @@ int main(int argc, char* argv[]) {
             }
         }
         // Handle AI moves
-        if (game.getCurrentPlayer() == BLACK && !game.isGameOver)
+        if (!game.isGameOver && game.getCurrentPlayer() == BLACK){
             game.makeAIMove();
+        }
         
-        // Display squares
         SDL_RenderClear(renderer);
+
+        // Display squares
+        lastMove = game.getLastMove();
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 boardRect.x = i * 100;
@@ -109,6 +115,14 @@ int main(int argc, char* argv[]) {
                     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 100);
                     SDL_RenderFillRect(renderer, &boardRect);
                 }
+                if (lastMove.from != NOSQUARE) {
+                    if (lastMove.from == square || lastMove.to == square) {
+                        boardRect.x = i * 100;
+                        boardRect.y = j * 100;
+                        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 100);
+                        SDL_RenderFillRect(renderer, &boardRect);
+                    }
+                }
             }
         }
 
@@ -120,9 +134,10 @@ int main(int argc, char* argv[]) {
                     if (grabbedPieceTargets & setBit(0ULL, square)) {
                         boardRect.x = i * 100;
                         boardRect.y = j * 100;
-                        SDL_SetRenderDrawColor(renderer, 255, 255, 0, 70);
+                        SDL_SetRenderDrawColor(renderer, 0, 0, 100, 50);
                         SDL_RenderFillRect(renderer, &boardRect);
                     }
+                    
                 }
             }
         }
@@ -152,15 +167,17 @@ int main(int argc, char* argv[]) {
             SDL_RenderCopy(renderer, pieceTexture[piece], NULL, &pieceRect);
         }
 
-        // Display game over
+        // Display game over badges
         if (game.isGameOver) {
-            int winner = game.getCurrentPlayer() == WHITE ? BLACK_KING : WHITE_KING;
-            int loser = game.getCurrentPlayer() == WHITE ? WHITE_KING : BLACK_KING;
+            int winner = game.winner;
+            int winnerKing = winner == WHITE ? WHITE_KING : BLACK_KING;
             for (int i = 0; i < 8; i++) {
                 for (int j = 0; j < 8; j++) {
                     int piece = game.getPieceAt((7 - j) * 8 + i);
-                    if (piece == winner || piece == loser) {
-                        int texture = piece == winner ? 12 : 13;
+                    if (piece == WHITE_KING || piece == BLACK_KING) {
+                        int texture = piece == WHITE_KING ? 14 : 15; // Tie texture
+                        if (winner != -1)
+                            texture = piece == winnerKing ? 12 : 13; // Checkmate texture
                         pieceRect.x = i * 100 + 60;
                         pieceRect.y = j * 100 + 10;
                         pieceRect.w = pieceWidth[texture];

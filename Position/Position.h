@@ -33,6 +33,8 @@ public:
     U64 getEnemyPieces(PieceType pieceType);
 
     bool halfmoveClockIsFifty();
+
+    U64 getPositionHash();
     
 private:
     // Bitboard representation
@@ -43,6 +45,11 @@ private:
     U8 enPassantTargetSquare;
     U8 halfmoveClock;
     U8 fullmoveCounter;
+
+    // Position hash
+    U64 positionHash;
+    U64 zobristRandomNumbers[781];
+    void initPositionHash();
 
     // Position FEN parsing
     void initializeBoards();

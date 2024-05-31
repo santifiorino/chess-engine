@@ -1,16 +1,9 @@
-using SDL2 SDL2_image for GUI and Gtest for testing
+using SDL2 SDL2_image for GUI
 
 start
 ```console
 santi:~$ git clone https://github.com/santifiorino/chess-engine
 santi:~$ cd chess-engine
-```
-
-build and run tests
-```console
-santi:~$ cmake -S . -B build
-santi:~$ cmake --build build
-santi:~$ cd build & ctest
 ```
 
 play (so far human vs random moves)
@@ -21,4 +14,8 @@ santi:~$ make
 santi:~$ ./ChessEngine.exe
 ```
 
-next: draw by repetition by a separate hash table using zobrist hashing for its keys
+TODO:
+- promoting pice picker GUI
+- draw by insufficient material
+- fun begins! abstract class for bot and start with the basic ones
+    - easy bot vs bot setup so they can play multiple matches and i can monitor which bot is better!

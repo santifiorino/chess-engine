@@ -13,15 +13,17 @@ void Position::makeMove(Move move){
     toggleCapturedPiece(move);
     toggleCastleRooks(move.type);
     
-    
     // Remove the piece from the original square
     bitboards[movedPiece] ^= fromSquare;
+    positionHash ^= zobristRandomNumbers[move.from * 12 + movedPiece];
+    // Place the piece on the new square
     if (move.type != PROMOTION && move.type != PROMOTION_CAPTURE) {
-        // Place the piece on the new square
         bitboards[movedPiece] |= toSquare;
+        positionHash ^= zobristRandomNumbers[move.to * 12 + movedPiece];
     } else {
         // Instead of placing the same piece, place the promoted piece
         bitboards[move.promotion + 6 * currentPlayer] |= toSquare;
+        positionHash ^= zobristRandomNumbers[move.to * 12 + move.promotion + 6 * currentPlayer];
     }
 
     // Update castling ability
@@ -44,11 +46,14 @@ void Position::makeMove(Move move){
 
     // Update current player
     currentPlayer = (currentPlayer == WHITE) ? BLACK : WHITE;
+    positionHash ^= zobristRandomNumbers[780];
 
     // Update en passant target square
     enPassantTargetSquare = NOSQUARE;
     if (move.type == DOUBLE_PAWN_PUSH) {
         enPassantTargetSquare = (move.from + move.to) / 2;
+        int enPassantFile = enPassantTargetSquare % 8;
+        positionHash ^= zobristRandomNumbers[772 + enPassantFile];
     }
 
     // Update halfmove clock
@@ -62,6 +67,12 @@ void Position::makeMove(Move move){
     if (currentPlayer == WHITE) {
         fullmoveCounter++;
     }
+
+    // Update position hash
+    if (!whiteCanKingsideCastle()) positionHash ^= zobristRandomNumbers[768];
+    if (!whiteCanQueensideCastle()) positionHash ^= zobristRandomNumbers[769];
+    if (!blackCanKingsideCastle()) positionHash ^= zobristRandomNumbers[770];
+    if (!blackCanQueensideCastle()) positionHash ^= zobristRandomNumbers[771];
 }
 
 void Position::removeCastlingAbility(Color color, MoveType type) {
@@ -97,23 +108,36 @@ void Position::unmakeMove(Move move, U8 castlingRights, U8 prevEnPassantTargetSq
     if (move.type != PROMOTION && move.type != PROMOTION_CAPTURE) {
         // Remove the piece from the new square
         bitboards[movedPiece] ^= toSquare;
+        positionHash ^= zobristRandomNumbers[move.to * 12 + movedPiece];
         // Put moved piece back where it was
         bitboards[movedPiece] |= fromSquare;
+        positionHash ^= zobristRandomNumbers[move.from * 12 + movedPiece];
     } else {
         // Remove the promoted piece from the new square
         bitboards[move.promotion + 6 * (1-currentPlayer)] ^= toSquare;
+        positionHash ^= zobristRandomNumbers[move.to * 12 + move.promotion + 6 * (1-currentPlayer)];
         // Put the pawn back where it was
-        bitboards[PAWN + 6 * (1-currentPlayer)] |= fromSquare;;
+        bitboards[PAWN + 6 * (1-currentPlayer)] |= fromSquare;
+        positionHash ^= zobristRandomNumbers[move.from * 12 + PAWN + 6 * (1-currentPlayer)];
     }
 
     // Update current player
     currentPlayer = (currentPlayer == WHITE) ? BLACK : WHITE;
+    positionHash ^= zobristRandomNumbers[780];
 
     // Update castling ability
     castlingAbility = castlingRights;
+    if (whiteCanKingsideCastle()) positionHash ^= zobristRandomNumbers[768];
+    if (whiteCanQueensideCastle()) positionHash ^= zobristRandomNumbers[769];
+    if (blackCanKingsideCastle()) positionHash ^= zobristRandomNumbers[770];
+    if (blackCanQueensideCastle()) positionHash ^= zobristRandomNumbers[771];
 
     // Update en passant target square
     enPassantTargetSquare = prevEnPassantTargetSquare;
+    int enPassantFile = enPassantTargetSquare % 8;
+    if (enPassantTargetSquare != 64) {
+        positionHash ^= zobristRandomNumbers[772 + enPassantFile];
+    }
 
     // Update halfmove clock
     halfmoveClock = prevHalfmoveClock;
@@ -128,10 +152,12 @@ void Position::toggleCapturedPiece(Move move, bool makeMove) {
     if (move.type == CAPTURE || move.type == PROMOTION_CAPTURE) {
         Piece captured = move.captured;
         bitboards[captured] ^= toSquare;
+        positionHash ^= zobristRandomNumbers[move.to * 12 + captured];
     } else if (move.type == EN_PASSANT) {
         U8 capturedPawnSquare = move.to + (currentPlayer == WHITE ? -8 : 8) * (makeMove ? 1 : -1);
         Piece capturedPawn = move.captured;
         bitboards[capturedPawn] ^= setBit(0ULL, capturedPawnSquare);
+        positionHash ^= zobristRandomNumbers[capturedPawnSquare * 12 + capturedPawn];
     }
 }
 
