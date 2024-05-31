@@ -15,7 +15,7 @@ santi:~$ ./ChessEngine.exe
 ```
 
 TODO:
-- promoting pice picker GUI
+- promoting piece picker GUI
 - draw by insufficient material
-- fun begins! abstract class for bot and start with the basic ones
-    - easy bot vs bot setup so they can play multiple matches and i can monitor which bot is better!
+- fun begins! abstract class for bot (search, evaluate, and pick move methods) and start with the basic ones
+    - create bot vs bot setup so they can play multiple matches and i can monitor which bot is better!

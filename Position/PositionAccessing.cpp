@@ -112,4 +112,45 @@ U64 Position::getPositionHash() {
     return positionHash;
 }
 
+bool Position::isInsufficientMaterial() {
+    U64 whitePieces = getOccupiedSquares(WHITE);
+    U64 blackPieces = getOccupiedSquares(BLACK);
+    U64 whiteAux = 0ULL;
+    U64 blackAux = 0ULL;
+
+    // King vs king
+    whiteAux |= bitboards[WHITE_KING];
+    blackAux |= bitboards[BLACK_KING];
+    if (whiteAux == whitePieces &&
+        blackAux == blackPieces) return true;
+
+    // King vs king and bishop
+    whiteAux |= bitboards[WHITE_BISHOP];
+    if (whiteAux == whitePieces &&
+        countOnes(bitboards[WHITE_BISHOP]) == 1 &&
+        blackAux == blackPieces) return true;
+    whiteAux ^= bitboards[WHITE_BISHOP];
+
+    blackAux |= bitboards[BLACK_BISHOP];
+    if (whiteAux == whitePieces &&
+        blackAux == blackPieces &&
+        countOnes(bitboards[BLACK_BISHOP]) == 1) return true;
+    blackAux ^= bitboards[BLACK_BISHOP];
+
+    // King vs king and knight
+    whiteAux |= bitboards[WHITE_KNIGHT];
+    if (whiteAux == whitePieces &&
+        countOnes(bitboards[WHITE_KNIGHT]) == 1 &&
+        blackAux == blackPieces) return true;
+    whiteAux ^= bitboards[WHITE_KNIGHT];
+
+    blackAux |= bitboards[BLACK_KNIGHT];
+    if (whiteAux == whitePieces &&
+        blackAux == blackPieces &&
+        countOnes(bitboards[BLACK_KNIGHT]) == 1) return true;
+    blackAux ^= bitboards[BLACK_KNIGHT];
+
+    return false;
+}
+
 #endif

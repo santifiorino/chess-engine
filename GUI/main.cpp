@@ -65,9 +65,9 @@ int main(int argc, char* argv[]) {
             int i = mouseX / 100;
             int j = mouseY / 100;
             int square = (7 - j) * 8 + i;
-            if (event.type == SDL_QUIT) {
-                running = false;
-            } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+            if (event.type == SDL_QUIT) running = false;
+            if (game.isGameOver) continue;    
+            if (event.type == SDL_MOUSEBUTTONDOWN) {
                 if (event.button.button == SDL_BUTTON_LEFT) {
                     // Grab piece
                     if (game.getPieceAt(square) != NOPIECE) {

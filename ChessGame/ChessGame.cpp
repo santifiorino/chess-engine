@@ -29,6 +29,7 @@ bool ChessGame::makeMove(U8 from, U8 to) {
     fullmoveCounter[currMoveIndex] = position.getFullmoveCounter();
     position.makeMove(move);
 
+    // Update repetitions map and check for draw by threefold repetition
     if (positionToRepetitionsMap.find(position.getPositionHash()) == positionToRepetitionsMap.end()) {
         positionToRepetitionsMap[position.getPositionHash()] = 1;
     } else {
@@ -39,14 +40,12 @@ bool ChessGame::makeMove(U8 from, U8 to) {
         isGameOver = true;
     }
 
-    currMoveIndex++;
-
     if (position.halfmoveClockIsFifty()) {
         std::cout << "Draw by fifty-move rule!" << std::endl;
         isGameOver = true;
     }
 
-    // Check if the game is over
+    // Check for checkmate or stalemate
     moveGenerator.generateLegalMoves(position);
     if (moveGenerator.legalMovesCount == 0) {
         Color enemyPlayer = position.getCurrentPlayer() == WHITE ? BLACK : WHITE;
@@ -60,6 +59,8 @@ bool ChessGame::makeMove(U8 from, U8 to) {
         }
         isGameOver = true;
     }
+
+    currMoveIndex++;
 
     return true;
 }

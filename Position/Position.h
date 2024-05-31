@@ -13,10 +13,7 @@ public:
     // Position accessing
     Piece getPieceAt(int square);
     Color getCurrentPlayer();
-    bool whiteCanKingsideCastle();
-    bool whiteCanQueensideCastle();
-    bool blackCanKingsideCastle();
-    bool blackCanQueensideCastle();
+    
     U8 getCastlingAbility();
     U8 getEnPassantTarget();
     U8 getHalfmoveClock();
@@ -26,15 +23,19 @@ public:
     U64 getOccupiedSquares(Color color);
     U64 getOccupiedSquares();
     U64 getEmptySquares();
-
     U64 getFriendlyPieces();
     U64 getFriendlyPieces(PieceType pieceType);
     U64 getEnemyPieces();
     U64 getEnemyPieces(PieceType pieceType);
+    U64 getPositionHash();
+
+    bool whiteCanKingsideCastle();
+    bool whiteCanQueensideCastle();
+    bool blackCanKingsideCastle();
+    bool blackCanQueensideCastle();
 
     bool halfmoveClockIsFifty();
-
-    U64 getPositionHash();
+    bool isInsufficientMaterial();
     
 private:
     // Bitboard representation

@@ -67,30 +67,32 @@ void Position::makeMove(Move move){
     if (currentPlayer == WHITE) {
         fullmoveCounter++;
     }
-
-    // Update position hash
-    if (!whiteCanKingsideCastle()) positionHash ^= zobristRandomNumbers[768];
-    if (!whiteCanQueensideCastle()) positionHash ^= zobristRandomNumbers[769];
-    if (!blackCanKingsideCastle()) positionHash ^= zobristRandomNumbers[770];
-    if (!blackCanQueensideCastle()) positionHash ^= zobristRandomNumbers[771];
 }
 
 void Position::removeCastlingAbility(Color color, MoveType type) {
     if (color == WHITE) {
         if (type == KINGSIDE_CASTLE || type == NORMAL) {
             // Remove white kingside castling ability
+            if (whiteCanKingsideCastle())
+                positionHash ^= zobristRandomNumbers[768];
             castlingAbility &= 0b1110;
         }
         if (type == QUEENSIDE_CASTLE  || type == NORMAL) {
+            if (whiteCanQueensideCastle())
+                positionHash ^= zobristRandomNumbers[769];
             // Remove white queenside castling ability
             castlingAbility &= 0b1101;
         }
     } else {
         if (type == KINGSIDE_CASTLE || type == NORMAL) {
+            if (blackCanKingsideCastle())
+                positionHash ^= zobristRandomNumbers[770];
             // Remove kingside castling ability
             castlingAbility &= 0b1011;
         }
         if (type == QUEENSIDE_CASTLE  || type == NORMAL) {
+            if (blackCanQueensideCastle())
+                positionHash ^= zobristRandomNumbers[771];
             // Remove queenside castling ability
             castlingAbility &= 0b0111;
         }
@@ -126,11 +128,15 @@ void Position::unmakeMove(Move move, U8 castlingRights, U8 prevEnPassantTargetSq
     positionHash ^= zobristRandomNumbers[780];
 
     // Update castling ability
+    if (whiteCanKingsideCastle() != (castlingRights & 0b1000))
+        positionHash ^= zobristRandomNumbers[768];
+    if (whiteCanQueensideCastle() != (castlingRights & 0b0100))
+        positionHash ^= zobristRandomNumbers[769];
+    if (blackCanKingsideCastle() != (castlingRights & 0b0010))
+        positionHash ^= zobristRandomNumbers[770];
+    if (blackCanQueensideCastle() != (castlingRights & 0b0001))
+        positionHash ^= zobristRandomNumbers[771];
     castlingAbility = castlingRights;
-    if (whiteCanKingsideCastle()) positionHash ^= zobristRandomNumbers[768];
-    if (whiteCanQueensideCastle()) positionHash ^= zobristRandomNumbers[769];
-    if (blackCanKingsideCastle()) positionHash ^= zobristRandomNumbers[770];
-    if (blackCanQueensideCastle()) positionHash ^= zobristRandomNumbers[771];
 
     // Update en passant target square
     enPassantTargetSquare = prevEnPassantTargetSquare;
