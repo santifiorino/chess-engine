@@ -14,6 +14,7 @@ link_directories(D:/msys64/mingw64/lib)
 add_executable(
     ChessEngine
     main.cpp
+    ../Bots/Bots.cpp
     ../ChessGame/ChessGame.cpp
     ../MoveGenerator/MoveGenerator.cpp
     ../MoveGenerator/MoveGeneratorKing.cpp

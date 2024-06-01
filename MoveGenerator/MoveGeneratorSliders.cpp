@@ -33,7 +33,7 @@ void MoveGenerator::generateSliderMoves(Position& position, int& i, PieceType pi
         moves &= ~friendlyPieces;
         while (moves) {
             U8 to = bitScanForward(moves);
-            addMove(i, from, to, position.getPieceAt(to) == NOPIECE ? NORMAL : CAPTURE, position.getPieceAt(to), NOTYPE);
+            addMove(i, from, to, position.getPieceAt(to) == NOPIECE ? NORMAL : CAPTURE, position.getPieceAt(to), NOPIECE);
             moves &= moves - 1;
         }
         pieces &= pieces - 1;

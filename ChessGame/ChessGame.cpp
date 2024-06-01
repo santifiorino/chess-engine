@@ -39,6 +39,10 @@ bool ChessGame::makeMove(U8 from, U8 to) {
         std::cout << "Draw by threefold repetition!" << std::endl;
         isGameOver = true;
     }
+    if (position.isInsufficientMaterial()) {
+        std::cout << "Draw by insufficient material!" << std::endl;
+        isGameOver = true;
+    }
 
     if (position.halfmoveClockIsFifty()) {
         std::cout << "Draw by fifty-move rule!" << std::endl;
@@ -87,24 +91,19 @@ Color ChessGame::getCurrentPlayer() {
     return position.getCurrentPlayer();
 }
 
-void ChessGame::makeAIMove() {
-    moveGenerator.generateLegalMoves(position);
-    // select a random move
-    int randomMoveIndex = rand() % moveGenerator.legalMovesCount;
-    for (int i = 0; i < moveGenerator.pseudoLegalMovesCount; i++) {
-        if (moveGenerator.legalMove[i]) {
-            randomMoveIndex--;
-            if (randomMoveIndex == -1) {
-                makeMove(moveGenerator.pseudoLegalMoves[i].from, moveGenerator.pseudoLegalMoves[i].to);
-                break;
-            }
-        }
-    }
+void ChessGame::makeWhiteMove() {
+    Move move = randomBot.makeMove(position, moveGenerator);
+    makeMove(move.from, move.to);
+}
+
+void ChessGame::makeBlackMove() {
+    Move move = materialDepthOneBot.makeMove(position, moveGenerator);
+    makeMove(move.from, move.to);
 }
 
 Move ChessGame::getLastMove() {
     if (currMoveIndex == 0) {
-        Move move = {NOSQUARE, NOSQUARE, NORMAL, NOPIECE, NOTYPE};
+        Move move = {NOSQUARE, NOSQUARE, NORMAL, NOPIECE, NOPIECE};
         return move;
     }
     return moveList[currMoveIndex - 1];

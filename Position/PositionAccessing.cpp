@@ -153,4 +153,8 @@ bool Position::isInsufficientMaterial() {
     return false;
 }
 
+int Position::getMaterialScore() {
+    return materialScore;
+}
+
 #endif

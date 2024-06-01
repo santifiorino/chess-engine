@@ -22,7 +22,7 @@ void MoveGenerator::generateKingMoves(Position& position, int& i) {
     U64 moves = arrKingMoves[from] & ~friendlyPieces;
     while (moves) {
         U8 to = bitScanForward(moves);
-        addMove(i, from, to, position.getPieceAt(to) == NOPIECE ? NORMAL : CAPTURE, position.getPieceAt(to), NOTYPE);
+        addMove(i, from, to, position.getPieceAt(to) == NOPIECE ? NORMAL : CAPTURE, position.getPieceAt(to), NOPIECE);
         moves &= moves - 1;
     }
 }
@@ -31,11 +31,11 @@ void MoveGenerator::generateKingMoves(Position& position, int& i) {
 
 void MoveGenerator::generateCastlingMoves(Position& position, int& i) {
     if (position.getCurrentPlayer() == WHITE) {
-        if (whiteCanKingsideCastle(position))  addMove(i, E1, G1, KINGSIDE_CASTLE, NOPIECE, NOTYPE);
-        if (whiteCanQueensideCastle(position)) addMove(i, E1, C1, QUEENSIDE_CASTLE, NOPIECE, NOTYPE);
+        if (whiteCanKingsideCastle(position))  addMove(i, E1, G1, KINGSIDE_CASTLE, NOPIECE, NOPIECE);
+        if (whiteCanQueensideCastle(position)) addMove(i, E1, C1, QUEENSIDE_CASTLE, NOPIECE, NOPIECE);
     } else {
-        if (blackCanKingsideCastle(position)) addMove(i, E8, G8, KINGSIDE_CASTLE, NOPIECE, NOTYPE);
-        if (blackCanQueensideCastle(position)) addMove(i, E8, C8, QUEENSIDE_CASTLE, NOPIECE, NOTYPE);
+        if (blackCanKingsideCastle(position)) addMove(i, E8, G8, KINGSIDE_CASTLE, NOPIECE, NOPIECE);
+        if (blackCanQueensideCastle(position)) addMove(i, E8, C8, QUEENSIDE_CASTLE, NOPIECE, NOPIECE);
     }
 }
 

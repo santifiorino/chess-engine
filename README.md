@@ -6,7 +6,7 @@ santi:~$ git clone https://github.com/santifiorino/chess-engine
 santi:~$ cd chess-engine
 ```
 
-play (so far human vs random moves)
+play (so far material counter depth 1 vs random mover)
 ```console
 santi:~$ mkdir GUI/build & cd GUI/build
 santi:~$ cmake ..
@@ -16,6 +16,3 @@ santi:~$ ./ChessEngine.exe
 
 TODO:
 - promoting piece picker GUI
-- draw by insufficient material
-- fun begins! abstract class for bot (search, evaluate, and pick move methods) and start with the basic ones
-    - create bot vs bot setup so they can play multiple matches and i can monitor which bot is better!

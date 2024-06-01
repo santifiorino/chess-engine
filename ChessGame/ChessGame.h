@@ -2,6 +2,7 @@
 #define CHESS_GAME_H
 
 #include "../MoveGenerator/MoveGenerator.h"
+#include "../Bots/Bots.h"
 #include <unordered_map>
 
 class ChessGame {
@@ -12,7 +13,8 @@ public:
     bool unmakeMove(U8 from, U8 to);
     U64 getMovesFrom(int from);
     Color getCurrentPlayer();
-    void makeAIMove();
+    void makeWhiteMove();
+    void makeBlackMove();
     Move getLastMove();
 
     bool isGameOver;
@@ -31,6 +33,9 @@ private:
     U8 fullmoveCounter[1024];
 
     std::unordered_map<U64, int> positionToRepetitionsMap;
+
+    RandomBot randomBot;
+    MaterialDepthOneBot materialDepthOneBot;
 };
 
 #endif

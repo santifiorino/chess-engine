@@ -56,7 +56,7 @@ bool MoveGenerator::checkMoveLegality(Position &position, Move move) {
     return res;
 }
 
-void MoveGenerator::addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, PieceType promotion) {
+void MoveGenerator::addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, Piece promotion) {
     Move move = {from, to, type, captured, promotion};
     pseudoLegalMoves[i] = move;
     i++;

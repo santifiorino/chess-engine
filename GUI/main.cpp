@@ -3,6 +3,9 @@
 
 #include "../ChessGame/ChessGame.h"
 
+#include <thread>
+#include <chrono>
+
 const int WHITE_SQUARE_COLOR[3] = {237, 214, 167};
 const int BLACK_SQUARE_COLOR[3] = {184, 135, 98};
 
@@ -92,8 +95,14 @@ int main(int argc, char* argv[]) {
             }
         }
         // Handle AI moves
-        if (!game.isGameOver && game.getCurrentPlayer() == BLACK){
-            game.makeAIMove();
+        if (!game.isGameOver){
+            if (game.getCurrentPlayer() == BLACK){
+                game.makeBlackMove();
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            } else {
+                game.makeWhiteMove();
+                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+            }
         }
         
         SDL_RenderClear(renderer);

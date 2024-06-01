@@ -17,7 +17,7 @@ class MoveGenerator {
 
     private:
         void generatePseudoLegalMoves(Position &position);
-        void addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, PieceType promotion);
+        void addMove(int& i, U8 from, U8 to, MoveType type, Piece captured, Piece promotion);
         bool checkMoveLegality(Position &position, Move move);
         // PAWN MOVES
         // Pawn pushes

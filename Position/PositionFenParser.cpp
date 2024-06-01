@@ -4,6 +4,7 @@
 #include "Position.h"
 
 void Position::parseFen(const char* FEN) {
+    materialScore = 0;
     int i = 0;
     initializeBoards();
     parsePiecePlacement(FEN, i);
@@ -31,6 +32,7 @@ void Position::parsePiecePlacement(const char* FEN, int& i){
             continue;
         }
         Piece piece = charToPiece(FEN[i]);
+        materialScore += pieceValue[piece];
         bitboards[piece] |= (1ULL << toBoardIndex(file, rank));
         rank++;
         i++;

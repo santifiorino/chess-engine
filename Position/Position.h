@@ -37,6 +37,8 @@ public:
     bool halfmoveClockIsFifty();
     bool isInsufficientMaterial();
     
+    int getMaterialScore();
+
 private:
     // Bitboard representation
     U64 bitboards[12]; // A1 = Least significant bit, H8 = Most significant bit
@@ -66,6 +68,9 @@ private:
     void toggleCapturedPiece(Move move, bool makeMove=true);
     void toggleCastleRooks(MoveType type, bool makeMove=true); 
     void removeCastlingAbility(Color color, MoveType type);
+
+    int materialScore;
+    int pieceValue[12] = {1, 3, 3, 5, 9, 10000000, -1, -3, -3, -5, -9, -10000000};
 };
 
 #endif

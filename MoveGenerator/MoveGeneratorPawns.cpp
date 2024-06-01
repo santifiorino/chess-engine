@@ -25,12 +25,20 @@ void MoveGenerator::generatePawnPush(U64 pawns, int& i, Color color, bool isDoub
         if (from == 0) break;
         U8 to = from + (isDoublePush ? 16 : 8) * (color == WHITE ? 1 : -1);
         if (color == WHITE && to >= 56 || color == BLACK && to < 8) {
-            addMove(i, from, to, PROMOTION, NOPIECE, QUEEN);
-            addMove(i, from, to, PROMOTION, NOPIECE, ROOK);
-            addMove(i, from, to, PROMOTION, NOPIECE, BISHOP);
-            addMove(i, from, to, PROMOTION, NOPIECE, KNIGHT);
+            if (color == WHITE) {
+                addMove(i, from, to, PROMOTION, NOPIECE, WHITE_QUEEN);
+                addMove(i, from, to, PROMOTION, NOPIECE, WHITE_ROOK);
+                addMove(i, from, to, PROMOTION, NOPIECE, WHITE_BISHOP);
+                addMove(i, from, to, PROMOTION, NOPIECE, WHITE_KNIGHT);
+            } else {
+                addMove(i, from, to, PROMOTION, NOPIECE, BLACK_QUEEN);
+                addMove(i, from, to, PROMOTION, NOPIECE, BLACK_ROOK);
+                addMove(i, from, to, PROMOTION, NOPIECE, BLACK_BISHOP);
+                addMove(i, from, to, PROMOTION, NOPIECE, BLACK_KNIGHT);
+            }
+            
         } else {
-            addMove(i, from, to, isDoublePush ? DOUBLE_PAWN_PUSH : NORMAL, NOPIECE, NOTYPE);
+            addMove(i, from, to, isDoublePush ? DOUBLE_PAWN_PUSH : NORMAL, NOPIECE, NOPIECE);
         }
         pawns &= pawns - 1;
     }
@@ -58,15 +66,22 @@ void MoveGenerator::generatePawnCaptures(Position& position, int& i) {
         while (attacks) {
             U8 to = bitScanForward(attacks);
             if (to == position.getEnPassantTarget()) {
-                addMove(i, from, to, EN_PASSANT, color == WHITE ? BLACK_PAWN : WHITE_PAWN, NOTYPE);
+                addMove(i, from, to, EN_PASSANT, color == WHITE ? BLACK_PAWN : WHITE_PAWN, NOPIECE);
             } else {
                 if (color == WHITE && to >= 56 || color == BLACK && to < 8) {
-                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), QUEEN);
-                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), ROOK);
-                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), BISHOP);
-                    addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), KNIGHT);
+                    if (color == WHITE) {
+                        addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), WHITE_QUEEN);
+                        addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), WHITE_ROOK);
+                        addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), WHITE_BISHOP);
+                        addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), WHITE_KNIGHT);
+                    } else {
+                        addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), BLACK_QUEEN);
+                        addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), BLACK_ROOK);
+                        addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), BLACK_BISHOP);
+                        addMove(i, from, to, PROMOTION_CAPTURE, position.getPieceAt(to), BLACK_KNIGHT);
+                    }
                 } else {
-                    addMove(i, from, to, CAPTURE, position.getPieceAt(to), NOTYPE);
+                    addMove(i, from, to, CAPTURE, position.getPieceAt(to), NOPIECE);
                 }
             }
             attacks &= attacks - 1;

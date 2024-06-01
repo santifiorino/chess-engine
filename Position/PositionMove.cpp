@@ -10,6 +10,21 @@ void Position::makeMove(Move move){
     U64 fromSquare = 1ULL << move.from;
     U64 toSquare = 1ULL << move.to;
 
+    if (move.type == CAPTURE || move.type == PROMOTION_CAPTURE || move.type == EN_PASSANT) {
+        Piece captured = move.captured;
+        materialScore -= pieceValue[captured];
+    }
+    if (move.type == PROMOTION || move.type == PROMOTION_CAPTURE) {
+        if (move.type == PROMOTION_CAPTURE) {
+            if (currentPlayer == WHITE) {
+                materialScore -= 1;
+            } else {
+                materialScore += 1;
+            }
+        }
+        materialScore += pieceValue[move.promotion];
+    }
+
     toggleCapturedPiece(move);
     toggleCastleRooks(move.type);
     
@@ -22,8 +37,8 @@ void Position::makeMove(Move move){
         positionHash ^= zobristRandomNumbers[move.to * 12 + movedPiece];
     } else {
         // Instead of placing the same piece, place the promoted piece
-        bitboards[move.promotion + 6 * currentPlayer] |= toSquare;
-        positionHash ^= zobristRandomNumbers[move.to * 12 + move.promotion + 6 * currentPlayer];
+        bitboards[move.promotion] |= toSquare;
+        positionHash ^= zobristRandomNumbers[move.to * 12 + move.promotion];
     }
 
     // Update castling ability
@@ -104,6 +119,21 @@ void Position::unmakeMove(Move move, U8 castlingRights, U8 prevEnPassantTargetSq
     U64 fromSquare = setBit(0ULL, move.from);
     U64 toSquare = setBit(0ULL, move.to);
 
+    if (move.type == CAPTURE || move.type == PROMOTION_CAPTURE || move.type == EN_PASSANT) {
+        Piece captured = move.captured;
+        materialScore += pieceValue[captured];
+    }
+    if (move.type == PROMOTION || move.type == PROMOTION_CAPTURE) {
+        if (move.type == PROMOTION_CAPTURE) {
+            if (currentPlayer == WHITE) {
+                materialScore -= 1;
+            } else {
+                materialScore += 1;
+            }
+        }
+        materialScore -= pieceValue[move.promotion];
+    }
+
     toggleCapturedPiece(move, false);
     toggleCastleRooks(move.type, false);
 
@@ -116,8 +146,8 @@ void Position::unmakeMove(Move move, U8 castlingRights, U8 prevEnPassantTargetSq
         positionHash ^= zobristRandomNumbers[move.from * 12 + movedPiece];
     } else {
         // Remove the promoted piece from the new square
-        bitboards[move.promotion + 6 * (1-currentPlayer)] ^= toSquare;
-        positionHash ^= zobristRandomNumbers[move.to * 12 + move.promotion + 6 * (1-currentPlayer)];
+        bitboards[move.promotion] ^= toSquare;
+        positionHash ^= zobristRandomNumbers[move.to * 12 + move.promotion];
         // Put the pawn back where it was
         bitboards[PAWN + 6 * (1-currentPlayer)] |= fromSquare;
         positionHash ^= zobristRandomNumbers[move.from * 12 + PAWN + 6 * (1-currentPlayer)];

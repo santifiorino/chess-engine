@@ -51,7 +51,7 @@ struct Move {
     U8 to;
     MoveType type;
     Piece captured;
-    PieceType promotion;
+    Piece promotion;
 };
 
 enum AlgebraicNotation {
